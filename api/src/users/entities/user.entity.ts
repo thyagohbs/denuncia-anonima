@@ -21,6 +21,9 @@ export class User {
   @Exclude()
   password: string;
 
+  @Column('simple-array', { default: ['user'] })
+  roles: string[];
+
   @OneToMany(() => Report, (report) => report.user)
   reports: Report[];
 
