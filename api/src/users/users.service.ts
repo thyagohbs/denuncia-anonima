@@ -21,7 +21,10 @@ export class UsersService {
       throw new ConflictException('Email já está em uso');
     }
 
-    const user = this.usersRepository.create(createUserDto);
+    const user = this.usersRepository.create({
+      ...createUserDto,
+      roles: ['user'],
+    });
     await this.usersRepository.save(user);
 
     const { password, ...result } = user;
@@ -41,6 +44,26 @@ export class UsersService {
     if (!user) {
       throw new NotFoundException(`Usuário com ID ${id} não encontrado`);
     }
+    return user;
+  }
+
+  async addRole(userId: number, role: string): Promise<User> {
+    const user = await this.findById(userId);
+
+    if (!user.roles.includes(role)) {
+      user.roles.push(role);
+      await this.usersRepository.save(user);
+    }
+
+    return user;
+  }
+
+  async removeRole(userId: number, role: string): Promise<User> {
+    const user = await this.findById(userId);
+
+    user.roles = user.roles.filter((r) => r !== role);
+    await this.usersRepository.save(user);
+
     return user;
   }
 }
