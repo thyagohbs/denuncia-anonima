@@ -3,13 +3,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Report, ReportType } from './entities/report.entity';
 import { CreateReportDto } from './dto/create-report.dto';
-import { v4 as uuidv4 } from 'uuid';
+import { ProtocoloService } from './services/protocolo.service';
 
 @Injectable()
 export class ReportsService {
   constructor(
     @InjectRepository(Report)
     private reportsRepository: Repository<Report>,
+    private protocoloService: ProtocoloService,
   ) {}
 
   async create(
@@ -18,7 +19,7 @@ export class ReportsService {
   ): Promise<Report> {
     const report = this.reportsRepository.create({
       ...createReportDto,
-      protocolo: `DEN-${uuidv4().substring(0, 8).toUpperCase()}`,
+      protocolo: this.protocoloService.gerarProtocolo(),
       user: userId ? { id: userId } : null,
     });
 
@@ -33,6 +34,10 @@ export class ReportsService {
   }
 
   async findByProtocol(protocolo: string): Promise<Report> {
+    if (!this.protocoloService.validarProtocolo(protocolo)) {
+      throw new NotFoundException('Formato de protocolo inválido');
+    }
+
     const report = await this.reportsRepository.findOne({
       where: { protocolo },
     });
