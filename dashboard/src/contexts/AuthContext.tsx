@@ -1,10 +1,12 @@
 import React, { createContext, useState, useEffect, ReactNode, useContext } from 'react';
 import authService from '../services/auth.service';
 import { User } from '../types';
+import { useNavigate } from 'react-router-dom';
 
 interface AuthContextProps {
     currentUser: User | null;
     isAuthenticated: boolean;
+    isAdmin: boolean;
     isLoading: boolean;
     login: (email: string, password: string) => Promise<any>;
     logout: () => void;
@@ -53,14 +55,22 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         return authService.register(email, password);
     };
 
+    // Verifica se o usuário tem a role de admin
+    const isAdmin = !!currentUser?.roles?.includes('admin');
+
+    const hasRole = (role: string) => {
+        return authService.hasRole(role);
+    };
+
     const value = {
         currentUser,
         isAuthenticated: !!currentUser,
+        isAdmin,
         isLoading,
         login,
         logout,
         register,
-        hasRole: (role: string) => authService.hasRole(role),
+        hasRole,
     };
 
     return (

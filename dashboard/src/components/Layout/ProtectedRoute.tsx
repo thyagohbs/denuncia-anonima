@@ -1,14 +1,24 @@
 import React from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { Box, CircularProgress } from '@mui/material';
 
 interface ProtectedRouteProps {
     requiredRole?: string;
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ requiredRole }) => {
-    const { isAuthenticated, hasRole } = useAuth();
+    const { isAuthenticated, hasRole, isLoading } = useAuth();
     const location = useLocation();
+
+    // Mostra um indicador de carregamento enquanto verifica a autenticação
+    if (isLoading) {
+        return (
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+                <CircularProgress />
+            </Box>
+        );
+    }
 
     // Verifica se o usuário está autenticado
     if (!isAuthenticated) {

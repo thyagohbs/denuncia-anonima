@@ -1,10 +1,11 @@
 import React from 'react';
-import { RouterProvider, createBrowserRouter } from 'react-router-dom';
+import { RouterProvider, createBrowserRouter, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import theme from './styles/theme';
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, Container, CircularProgress } from '@mui/material';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 import Login from './components/auth/Login';
 import Register from './components/auth/Register';
@@ -12,27 +13,48 @@ import Dashboard from './components/dashboard/Dashboard';
 import ProtectedRoute from './components/Layout/ProtectedRoute';
 import Navbar from './components/Layout/Navbar';
 import UnAuthorized from './components/auth/UnAuthorized';
+import { Outlet } from '@mui/icons-material';
 
-// Layout para páginas autenticadas
-const AuthenticatedLayout = () => {
+// Layout para páginas autenticadas com Navbar
+const AdminLayout = () => {
   return (
     <>
       <Navbar />
-      <main>
-        <ProtectedRoute />
-      </main>
+      <Box component="main" sx={{ pt: 2 }}>
+        <Outlet />
+      </Box>
     </>
   );
 };
 
+// Loading Fallback
+const LoadingFallback = () => (
+  <Container>
+    <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
+      <CircularProgress />
+    </Box>
+  </Container>
+);
+
+// Cria o cliente de Query
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: true,
+      staleTime: 30000,
+    },
+  },
+});
+
 // Configuração do roteador
 const router = createBrowserRouter([
-  // Rota inicial redirecionada para login
+  // Rota inicial redirecionada para admin se autenticado, senão para login
   {
     path: '/',
-    element: <Login />,
+    element: <Navigate to="/admin" replace />,
   },
-  // Rota de login explícita
+  // Rotas públicas
   {
     path: '/login',
     element: <Login />,
@@ -41,21 +63,41 @@ const router = createBrowserRouter([
     path: '/register',
     element: <Register />,
   },
-  // Rotas protegidas
-  {
-    path: '/',
-    element: <AuthenticatedLayout />,
-    children: [
-      {
-        path: '/admin',
-        element: <Dashboard />,
-      },
-      // Adicione outras rotas protegidas conforme necessário
-    ],
-  },
   {
     path: '/unauthorized',
     element: <UnAuthorized />,
+  },
+  // Rotas protegidas
+  {
+    path: '/',
+    element: <ProtectedRoute />,
+    children: [
+      {
+        path: '/',
+        element: <AdminLayout />,
+        children: [
+          {
+            path: '/admin',
+            element: <Dashboard />,
+          },
+          // Adicione aqui outras rotas protegidas
+          {
+            path: '/admin/reports',
+            element: <Dashboard />, // Substitua por um componente específico se existir
+          },
+          {
+            path: '/admin/users',
+            element: <ProtectedRoute requiredRole="admin" />,
+            children: [
+              {
+                path: '',
+                element: <Dashboard /> // Substitua por um componente específico se existir
+              }
+            ]
+          },
+        ],
+      }
+    ],
   },
   // Rota de fallback para página não encontrada
   {
@@ -63,6 +105,9 @@ const router = createBrowserRouter([
     element: (
       <Box sx={{ p: 4, textAlign: 'center' }}>
         <Typography variant="h4">Página não encontrada</Typography>
+        <Typography variant="body1" sx={{ mt: 2 }}>
+          A página que você está procurando não existe.
+        </Typography>
       </Box>
     ),
   },
@@ -72,9 +117,11 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <AuthProvider>
-        <RouterProvider router={router} />
-      </AuthProvider>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <RouterProvider router={router} fallbackElement={<LoadingFallback />} />
+        </AuthProvider>
+      </QueryClientProvider>
     </ThemeProvider>
   );
 }

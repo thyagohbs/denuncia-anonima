@@ -2,6 +2,7 @@ import axios, {
   AxiosInstance,
   InternalAxiosRequestConfig,
   AxiosResponse,
+  AxiosError,
 } from "axios";
 
 const API_URL = "http://localhost:3000";
@@ -27,4 +28,24 @@ api.interceptors.request.use(
   }
 );
 
-// Resto do código...
+// Interceptor para lidar com respostas e erros
+api.interceptors.response.use(
+  (response: AxiosResponse) => {
+    return response;
+  },
+  (error: AxiosError) => {
+    // Verificar se o erro é de autenticação (401)
+    if (error.response && error.response.status === 401) {
+      // Token expirado ou inválido
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+
+      // Redirecionar para login apenas se não estiver já na página de login ou registro
+      const currentPath = window.location.pathname;
+      if (!["/login", "/register"].includes(currentPath)) {
+        window.location.href = "/login";
+      }
+    }
+    return Promise.reject(error);
+  }
+);
