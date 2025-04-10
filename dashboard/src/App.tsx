@@ -13,7 +13,8 @@ import Dashboard from './components/dashboard/Dashboard';
 import ProtectedRoute from './components/Layout/ProtectedRoute';
 import Navbar from './components/Layout/Navbar';
 import UnAuthorized from './components/auth/UnAuthorized';
-import { Outlet } from '@mui/icons-material';
+import { Outlet } from 'react-router-dom';
+import ReportDetailView from './components/dashboard/ReportDetailView';
 
 // Layout para páginas autenticadas com Navbar
 const AdminLayout = () => {
@@ -94,6 +95,14 @@ const router = createBrowserRouter([
                 element: <Dashboard /> // Substitua por um componente específico se existir
               }
             ]
+          },
+          {
+            path: '/admin/reports/:id',
+            element: (
+              <React.Suspense fallback={<LoadingFallback />}>
+                <ReportDetailView />
+              </React.Suspense>
+            ),
           },
         ],
       }

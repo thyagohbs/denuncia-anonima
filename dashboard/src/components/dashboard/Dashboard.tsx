@@ -42,6 +42,7 @@ import type { SelectChangeEvent } from '@mui/material/Select';
 import { ReportType, ReportFilters } from '../../types';
 import { commonStyles } from '../../styles/commonStyles';
 import reportsService from '../../services/reports.service';
+import ReportDetailView from './ReportDetailView';
 
 // Interface para os relatórios
 interface Report {
@@ -458,80 +459,14 @@ const Dashboard = () => {
             </Paper>
 
             {/* Modal de Detalhes da Denúncia */}
-            <Dialog
-                open={detailsOpen}
-                onClose={handleCloseDetails}
-                maxWidth="md"
-                fullWidth
-            >
-                {selectedReport && (
-                    <>
-                        <DialogTitle>
-                            Detalhes da Denúncia - {selectedReport.protocolo}
-                        </DialogTitle>
-                        <DialogContent dividers>
-                            <Grid container spacing={3}>
-                                <Grid size={{ xs: 12, md: 6 }}>
-                                    <Box sx={{ mb: 2 }}>
-                                        <Typography variant="subtitle2" color="text.secondary">
-                                            Tipo
-                                        </Typography>
-                                        <Chip
-                                            label={ReportTypeLabels[selectedReport.tipo]}
-                                            color={typeColors[selectedReport.tipo]}
-                                            sx={{ mt: 0.5 }}
-                                        />
-                                    </Box>
-                                </Grid>
-
-                                <Grid size={{ xs: 12, md: 6 }}>
-                                    <Box sx={{ mb: 2 }}>
-                                        <Typography variant="subtitle2" color="text.secondary">
-                                            Data
-                                        </Typography>
-                                        <Typography variant="body1">
-                                            {formatDate(selectedReport.criadoEm)}
-                                        </Typography>
-                                    </Box>
-                                </Grid>
-
-                                <Grid size={{ xs: 12 }} >
-                                    <Box sx={{ mb: 2 }}>
-                                        <Typography variant="subtitle2" color="text.secondary">
-                                            Localização
-                                        </Typography>
-                                        <Typography variant="body1">
-                                            {selectedReport.localizacao?.endereco ||
-                                                `Latitude: ${selectedReport.localizacao?.latitude}, Longitude: ${selectedReport.localizacao?.longitude}`}
-                                        </Typography>
-                                    </Box>
-                                </Grid>
-
-                                <Grid size={{ xs: 12 }}>
-                                    <Box sx={{ mb: 2 }}>
-                                        <Typography variant="subtitle2" color="text.secondary">
-                                            Detalhes
-                                        </Typography>
-                                        <Paper
-                                            variant="outlined"
-                                            sx={{ p: 2, mt: 1, bgcolor: 'background.default', whiteSpace: 'pre-line' }}
-                                        >
-                                            <Typography variant="body2">
-                                                {selectedReport.detalhes}
-                                            </Typography>
-                                        </Paper>
-                                    </Box>
-                                </Grid>
-                            </Grid>
-                        </DialogContent>
-                        <DialogActions>
-                            <Button onClick={handleCloseDetails} color="primary">
-                                Fechar
-                            </Button>
-                        </DialogActions>
-                    </>
-                )}
-            </Dialog>
+            {selectedReport && (
+                <ReportDetailView
+                    reportId={selectedReport.protocolo} // Use o protocolo como ID
+                    isOpen={detailsOpen}
+                    onClose={handleCloseDetails}
+                    isModal={true}
+                />
+            )}
         </Container >
     );
 };
