@@ -1,5 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 import {
     Container,
     Typography,
@@ -36,6 +38,7 @@ import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import ClearIcon from '@mui/icons-material/Clear';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import RefreshIcon from '@mui/icons-material/Refresh';
+import LogoutIcon from '@mui/icons-material/Logout';
 import type { SortDirection } from '@mui/material/TableCell';
 import type { SelectChangeEvent } from '@mui/material/Select';
 
@@ -234,6 +237,15 @@ const Dashboard = () => {
         setDetailsOpen(false);
     };
 
+    const navigate = useNavigate();
+    const { logout } = useAuth();
+
+    // Função para realizar o logout
+    const handleLogout = () => {
+        logout(); // Isso já remove o token e atualiza o estado de autenticação através do Context
+        navigate('/login');
+    };
+
     // Cabeçalho de tabela ordenável
     const SortableTableHeader: React.FC<SortableTableHeaderProps> = ({ id, label }) => (
         <TableCell
@@ -252,13 +264,30 @@ const Dashboard = () => {
 
     return (
         <Container maxWidth="lg" sx={commonStyles.pageContainer}>
-            <Box sx={{ mb: 4 }}>
-                <Typography variant="h4" component="h1" fontWeight="bold" color="text.primary">
-                    Dashboard de Denúncias
-                </Typography>
-                <Typography variant="body1" color="text.secondary" sx={{ mt: 1 }}>
-                    Gerencie e visualize todas as denúncias registradas
-                </Typography>
+            <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Box>
+                    <Typography variant="h4" component="h1" fontWeight="bold" color="text.primary">
+                        Dashboard de Denúncias
+                    </Typography>
+                    <Typography variant="body1" color="text.secondary" sx={{ mt: 1 }}>
+                        Gerencie e visualize todas as denúncias registradas
+                    </Typography>
+                </Box>
+                <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={handleLogout}
+                    startIcon={<LogoutIcon />}
+                    sx={{
+                        height: 'fit-content',
+                        transition: 'all 0.2s',
+                        '&:hover': {
+                            bgcolor: 'error.main',
+                        }
+                    }}
+                >
+                    Sair
+                </Button>
             </Box>
 
             {/* Seção de Filtros */}
