@@ -24,11 +24,13 @@
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
     "axios": "^1.8.4",
+    "framer-motion": "^12.6.5",
     "jsdom": "^26.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.55.0",
     "react-router-dom": "^7.5.0",
+    "swiper": "^11.2.6",
     "vitest": "^3.1.1",
     "zod": "^3.24.2",
     "zustand": "^5.0.3"
