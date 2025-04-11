@@ -1,9 +1,9 @@
 import React from 'react';
 import { RouterProvider, createBrowserRouter, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
-import { ThemeProvider } from '@mui/material/styles';
+import { ThemeProvider } from './contexts/ThemeContext';
+import { NotificationProvider } from './contexts/NotificationContext';
 import CssBaseline from '@mui/material/CssBaseline';
-import theme from './styles/theme';
 import { Box, Typography, Container, CircularProgress } from '@mui/material';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
@@ -11,22 +11,9 @@ import Login from './components/auth/Login';
 import Register from './components/auth/Register';
 import Dashboard from './components/dashboard/Dashboard';
 import ProtectedRoute from './components/Layout/ProtectedRoute';
-import Navbar from './components/Layout/Navbar';
+import AdminLayout from './components/Layout/AdminLayout';
 import UnAuthorized from './components/auth/UnAuthorized';
-import { Outlet } from 'react-router-dom';
 import ReportDetailView from './components/dashboard/ReportDetailView';
-
-// Layout para páginas autenticadas com Navbar
-const AdminLayout = () => {
-  return (
-    <>
-      <Navbar />
-      <Box component="main" sx={{ pt: 2 }}>
-        <Outlet />
-      </Box>
-    </>
-  );
-};
 
 // Loading Fallback
 const LoadingFallback = () => (
@@ -97,6 +84,16 @@ const router = createBrowserRouter([
             ]
           },
           {
+            path: '/admin/settings',
+            element: <ProtectedRoute requiredRole="admin" />,
+            children: [
+              {
+                path: '',
+                element: <Dashboard /> // Substitua por um componente específico de configurações
+              }
+            ]
+          },
+          {
             path: '/admin/reports/:id',
             element: (
               <React.Suspense fallback={<LoadingFallback />}>
@@ -124,11 +121,13 @@ const router = createBrowserRouter([
 
 function App() {
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeProvider>
       <CssBaseline />
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          <RouterProvider router={router} fallbackElement={<LoadingFallback />} />
+          <NotificationProvider>
+            <RouterProvider router={router} fallbackElement={<LoadingFallback />} />
+          </NotificationProvider>
         </AuthProvider>
       </QueryClientProvider>
     </ThemeProvider>

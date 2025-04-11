@@ -1,32 +1,38 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { useThemeContext } from '../../contexts/ThemeContext';
 import {
     AppBar,
     Toolbar,
     Typography,
-    Button,
     IconButton,
     Box,
     Menu,
     MenuItem,
-    Container,
-    Drawer,
-    List,
-    ListItem,
-    ListItemButton, // Adicionar esta importação
-    ListItemText,
     Divider,
-    Avatar
+    Avatar,
+    Tooltip,
+    useTheme
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import LightModeIcon from '@mui/icons-material/LightMode';
+import DarkModeIcon from '@mui/icons-material/DarkMode';
+import LogoutIcon from '@mui/icons-material/Logout';
 
-const Navbar: React.FC = () => {
-    const { currentUser, isAuthenticated, logout } = useAuth();
+interface NavbarProps {
+    drawerOpen: boolean;
+    toggleDrawer: () => void;
+    drawerWidth: number;
+}
+
+const Navbar: React.FC<NavbarProps> = ({ drawerOpen, toggleDrawer, drawerWidth }) => {
+    const { currentUser, logout } = useAuth();
+    const { mode, toggleColorMode } = useThemeContext();
     const navigate = useNavigate();
+    const theme = useTheme();
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-    const [mobileOpen, setMobileOpen] = React.useState(false);
 
     const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(event.currentTarget);
@@ -36,144 +42,93 @@ const Navbar: React.FC = () => {
         setAnchorEl(null);
     };
 
-    const handleDrawerToggle = () => {
-        setMobileOpen(!mobileOpen);
-    };
-
     const handleLogout = () => {
         logout();
         navigate('/login');
         handleMenuClose();
     };
 
-    const drawer = (
-        <Box onClick={handleDrawerToggle} sx={{ p: 2 }}>
-            <Typography variant="h6" sx={{ mb: 2 }}>
-                Sistema de Denúncias
-            </Typography>
-            <Divider sx={{ mb: 2 }} />
-            <List>
-                {isAuthenticated ? (
-                    <>
-                        <ListItem disablePadding>
-                            <ListItemButton component={Link} to="/admin">
-                                <ListItemText primary="Dashboard" />
-                            </ListItemButton>
-                        </ListItem>
-                        <ListItem disablePadding>
-                            <ListItemButton onClick={handleLogout}>
-                                <ListItemText primary="Sair" />
-                            </ListItemButton>
-                        </ListItem>
-                    </>
-                ) : (
-                    <>
-                        <ListItem disablePadding>
-                            <ListItemButton component={Link} to="/login">
-                                <ListItemText primary="Login" />
-                            </ListItemButton>
-                        </ListItem>
-                        <ListItem disablePadding>
-                            <ListItemButton component={Link} to="/register">
-                                <ListItemText primary="Cadastro" />
-                            </ListItemButton>
-                        </ListItem>
-                    </>
-                )}
-            </List>
-        </Box>
-    );
-
     return (
-        <Box sx={{ flexGrow: 1 }}>
-            <AppBar position="static" color="primary">
-                <Container maxWidth="xl">
-                    <Toolbar disableGutters>
-                        <Typography
-                            variant="h6"
-                            component="div"
-                            sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
+        <AppBar
+            position="fixed"
+            sx={{
+                width: { sm: `calc(100% - ${drawerWidth}px)` },
+                ml: { sm: `${drawerWidth}px` },
+                transition: theme.transitions.create(['margin', 'width'], {
+                    easing: theme.transitions.easing.easeOut,
+                    duration: theme.transitions.duration.enteringScreen,
+                }),
+                boxShadow: 1,
+                bgcolor: theme.palette.background.paper,
+                color: theme.palette.text.primary,
+            }}
+        >
+            <Toolbar>
+                <IconButton
+                    color="inherit"
+                    aria-label="abrir menu"
+                    edge="start"
+                    onClick={toggleDrawer}
+                    sx={{ mr: 2, display: { md: 'none' } }}
+                >
+                    <MenuIcon />
+                </IconButton>
+
+                <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+                    Sistema de Denúncias
+                </Typography>
+
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Tooltip title={`Mudar para tema ${mode === 'light' ? 'escuro' : 'claro'}`}>
+                        <IconButton onClick={toggleColorMode} color="inherit">
+                            {mode === 'light' ? <DarkModeIcon /> : <LightModeIcon />}
+                        </IconButton>
+                    </Tooltip>
+
+                    <Tooltip title="Perfil">
+                        <IconButton
+                            onClick={handleProfileMenuOpen}
+                            color="inherit"
+                            edge="end"
+                            aria-label="perfil do usuário"
                         >
-                            Sistema de Denúncias
-                        </Typography>
-
-                        <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-                            {isAuthenticated ? (
-                                <>
-                                    <Button color="inherit" component={Link} to="/admin" sx={{ mr: 1 }}>
-                                        Dashboard
-                                    </Button>
-
-                                    <IconButton
-                                        edge="end"
-                                        color="inherit"
-                                        aria-label="conta do usuário"
-                                        aria-controls="menu-appbar"
-                                        aria-haspopup="true"
-                                        onClick={handleProfileMenuOpen}
-                                    >
-                                        <AccountCircleIcon />
-                                    </IconButton>
-                                </>
-                            ) : (
-                                <>
-                                    <Button color="inherit" component={Link} to="/login">
-                                        Login
-                                    </Button>
-                                    <Button
-                                        component={Link}
-                                        to="/register"
-                                        sx={{ ml: 1, bgcolor: 'white', color: 'primary.main', '&:hover': { bgcolor: 'grey.100' } }}
-                                    >
-                                        Cadastro
-                                    </Button>
-                                </>
-                            )}
-                        </Box>
-
-                        <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
-                            <IconButton
-                                edge="start"
-                                color="inherit"
-                                aria-label="menu"
-                                onClick={handleDrawerToggle}
-                            >
-                                <MenuIcon />
-                            </IconButton>
-                        </Box>
-                    </Toolbar>
-                </Container>
-            </AppBar>
+                            <Avatar sx={{ width: 32, height: 32, bgcolor: theme.palette.primary.main }}>
+                                {currentUser?.email?.charAt(0).toUpperCase()}
+                            </Avatar>
+                        </IconButton>
+                    </Tooltip>
+                </Box>
+            </Toolbar>
 
             <Menu
-                id="menu-appbar"
                 anchorEl={anchorEl}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                keepMounted
-                transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+                id="account-menu"
                 open={Boolean(anchorEl)}
                 onClose={handleMenuClose}
+                PaperProps={{
+                    sx: {
+                        mt: 1.5,
+                        width: 200,
+                        '& .MuiMenuItem-root': {
+                            py: 1
+                        }
+                    },
+                }}
+                transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+                anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
             >
-                <MenuItem disabled>
-                    <Typography variant="body2">{currentUser?.email}</Typography>
+                <MenuItem disabled sx={{ opacity: 0.8 }}>
+                    <Typography variant="body2" noWrap>
+                        {currentUser?.email}
+                    </Typography>
                 </MenuItem>
                 <Divider />
-                <MenuItem onClick={handleLogout}>Sair</MenuItem>
+                <MenuItem onClick={handleLogout}>
+                    <LogoutIcon sx={{ mr: 2, fontSize: "1.25rem" }} />
+                    Sair
+                </MenuItem>
             </Menu>
-
-            <Drawer
-                variant="temporary"
-                open={mobileOpen}
-                onClose={handleDrawerToggle}
-                ModalProps={{ keepMounted: true }}
-                sx={{
-                    display: { xs: 'block', md: 'none' },
-                    '& .MuiDrawer-paper': { boxSizing: 'border-box', width: 240 },
-                }}
-            >
-                {drawer}
-            </Drawer>
-        </Box>
+        </AppBar>
     );
 };
 
