@@ -12,7 +12,7 @@ export default function HomePage() {
             {/* Hero Section */}
             <Box
                 sx={{
-                    py: 8,
+                    py: { xs: 4, sm: 6, md: 8 },
                     textAlign: 'center',
                     display: 'flex',
                     flexDirection: 'column',
@@ -24,33 +24,54 @@ export default function HomePage() {
                     variant="h2"
                     color="primary"
                     gutterBottom
-                    sx={{ fontWeight: 700, mb: 3 }}
+                    sx={{
+                        fontWeight: 700,
+                        mb: 3,
+                        fontSize: { xs: '2rem', sm: '2.75rem', md: '3.75rem' }
+                    }}
                 >
                     Sistema de Denúncia Anônima
                 </Typography>
-                <Typography variant="h5" color="text.secondary" paragraph sx={{ maxWidth: 'md', mb: 4 }}>
+                <Typography
+                    variant="h5"
+                    color="text.secondary"
+                    paragraph
+                    sx={{
+                        maxWidth: 'md',
+                        mb: 4,
+                        px: 2,
+                        fontSize: { xs: '1rem', sm: '1.25rem', md: '1.5rem' }
+                    }}
+                >
                     Faça sua denúncia de forma segura, sigilosa e anônima.
                     Ajude a combater irregularidades em sua comunidade.
                 </Typography>
-                <Grid container spacing={2} justifyContent="center">
-                    <Grid item>
+                <Grid
+                    container
+                    spacing={2}
+                    justifyContent="center"
+                    sx={{ px: 2 }}
+                >
+                    <Grid size={{ xs: 12, sm: 'auto' }}>
                         <Button
                             component={RouterLink}
                             to="/report"
                             variant="contained"
                             size="large"
                             startIcon={<ReportIcon />}
+                            sx={{ width: { xs: '100%', sm: 'auto' } }}
                         >
                             Fazer Denúncia
                         </Button>
                     </Grid>
-                    <Grid item>
+                    <Grid size={{ xs: 12 }} sm="auto">
                         <Button
                             component={RouterLink}
                             to="/track"
                             variant="outlined"
                             size="large"
                             startIcon={<SearchIcon />}
+                            sx={{ width: { xs: '100%', sm: 'auto' } }}
                         >
                             Consultar Denúncia
                         </Button>
@@ -59,14 +80,14 @@ export default function HomePage() {
             </Box>
 
             {/* Feature Section */}
-            <Box sx={{ py: 6 }}>
-                <Container sx={{ py: 4 }}>
-                    <Grid container spacing={4}>
-                        <Grid item xs={12} md={4}>
+            <Box sx={{ py: { xs: 4, sm: 6 } }}>
+                <Container sx={{ py: { xs: 2, sm: 4 } }}>
+                    <Grid container spacing={{ xs: 3, md: 4 }}>
+                        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                             <Paper
                                 elevation={2}
                                 sx={{
-                                    p: 4,
+                                    p: { xs: 3, sm: 4 },
                                     height: '100%',
                                     display: 'flex',
                                     flexDirection: 'column',
@@ -75,8 +96,13 @@ export default function HomePage() {
                                     borderRadius: 4,
                                 }}
                             >
-                                <SecurityIcon color="primary" sx={{ fontSize: 60, mb: 2 }} />
-                                <Typography variant="h5" component="h2" gutterBottom>
+                                <SecurityIcon color="primary" sx={{ fontSize: { xs: 40, sm: 60 }, mb: 2 }} />
+                                <Typography
+                                    variant="h5"
+                                    component="h2"
+                                    gutterBottom
+                                    sx={{ fontSize: { xs: '1.25rem', sm: '1.5rem' } }}
+                                >
                                     Segurança
                                 </Typography>
                                 <Typography variant="body1" color="text.secondary">
@@ -85,11 +111,11 @@ export default function HomePage() {
                                 </Typography>
                             </Paper>
                         </Grid>
-                        <Grid item xs={12} md={4}>
+                        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                             <Paper
                                 elevation={2}
                                 sx={{
-                                    p: 4,
+                                    p: { xs: 3, sm: 4 },
                                     height: '100%',
                                     display: 'flex',
                                     flexDirection: 'column',
@@ -98,8 +124,13 @@ export default function HomePage() {
                                     borderRadius: 4,
                                 }}
                             >
-                                <VisibilityOffIcon color="primary" sx={{ fontSize: 60, mb: 2 }} />
-                                <Typography variant="h5" component="h2" gutterBottom>
+                                <VisibilityOffIcon color="primary" sx={{ fontSize: { xs: 40, sm: 60 }, mb: 2 }} />
+                                <Typography
+                                    variant="h5"
+                                    component="h2"
+                                    gutterBottom
+                                    sx={{ fontSize: { xs: '1.25rem', sm: '1.5rem' } }}
+                                >
                                     Anonimato
                                 </Typography>
                                 <Typography variant="body1" color="text.secondary">
@@ -108,11 +139,11 @@ export default function HomePage() {
                                 </Typography>
                             </Paper>
                         </Grid>
-                        <Grid item xs={12} md={4}>
+                        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                             <Paper
                                 elevation={2}
                                 sx={{
-                                    p: 4,
+                                    p: { xs: 3, sm: 4 },
                                     height: '100%',
                                     display: 'flex',
                                     flexDirection: 'column',
@@ -121,8 +152,13 @@ export default function HomePage() {
                                     borderRadius: 4,
                                 }}
                             >
-                                <EmojiPeopleIcon color="primary" sx={{ fontSize: 60, mb: 2 }} />
-                                <Typography variant="h5" component="h2" gutterBottom>
+                                <EmojiPeopleIcon color="primary" sx={{ fontSize: { xs: 40, sm: 60 }, mb: 2 }} />
+                                <Typography
+                                    variant="h5"
+                                    component="h2"
+                                    gutterBottom
+                                    sx={{ fontSize: { xs: '1.25rem', sm: '1.5rem' } }}
+                                >
                                     Facilidade
                                 </Typography>
                                 <Typography variant="body1" color="text.secondary">
@@ -140,13 +176,18 @@ export default function HomePage() {
                 sx={{
                     bgcolor: 'primary.main',
                     color: 'primary.contrastText',
-                    py: 6,
-                    borderRadius: 4,
-                    mt: 4,
+                    py: { xs: 4, sm: 6 },
+                    borderRadius: { xs: 2, sm: 4 },
+                    mt: { xs: 2, sm: 4 },
                 }}
             >
-                <Container maxWidth="md" sx={{ textAlign: 'center' }}>
-                    <Typography variant="h4" component="h2" gutterBottom>
+                <Container maxWidth="md" sx={{ textAlign: 'center', px: { xs: 2, sm: 3 } }}>
+                    <Typography
+                        variant="h4"
+                        component="h2"
+                        gutterBottom
+                        sx={{ fontSize: { xs: '1.5rem', sm: '2.125rem' } }}
+                    >
                         Sua denúncia faz a diferença
                     </Typography>
                     <Typography variant="body1" paragraph sx={{ mb: 4 }}>
@@ -164,6 +205,7 @@ export default function HomePage() {
                             '&:hover': {
                                 bgcolor: 'grey.100',
                             },
+                            width: { xs: '100%', sm: 'auto' }
                         }}
                     >
                         Denuncie Agora

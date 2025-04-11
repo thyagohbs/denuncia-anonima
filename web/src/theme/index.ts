@@ -94,6 +94,31 @@ let theme = createTheme({
           textTransform: "none",
           fontWeight: 500,
         },
+        // Adicionando tamanhos responsivos para botões
+        sizeLarge: {
+          padding: "10px 22px",
+          "@media (max-width: 600px)": {
+            padding: "8px 16px",
+          },
+        },
+      },
+    },
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+          marginTop: "8px",
+          marginBottom: "8px",
+        },
+      },
+    },
+    MuiPaper: {
+      styleOverrides: {
+        rounded: {
+          borderRadius: 12,
+          "@media (max-width: 600px)": {
+            borderRadius: 8,
+          },
+        },
       },
     },
     MuiCard: {
@@ -101,6 +126,9 @@ let theme = createTheme({
         root: {
           borderRadius: 12,
           boxShadow: "0 8px 16px 0 rgba(0,0,0,0.1)",
+          "@media (max-width: 600px)": {
+            boxShadow: "0 4px 8px 0 rgba(0,0,0,0.1)",
+          },
         },
       },
     },
@@ -110,6 +138,15 @@ let theme = createTheme({
           boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
         },
       },
+    },
+  },
+  breakpoints: {
+    values: {
+      xs: 0,
+      sm: 600,
+      md: 900,
+      lg: 1200,
+      xl: 1536,
     },
   },
 });

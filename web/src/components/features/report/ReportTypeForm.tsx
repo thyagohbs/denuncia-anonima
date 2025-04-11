@@ -39,7 +39,11 @@ export default function ReportTypeForm({ onNext }: ReportTypeFormProps) {
 
     return (
         <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate>
-            <Typography variant="h6" gutterBottom>
+            <Typography
+                variant="h6"
+                gutterBottom
+                sx={{ fontSize: { xs: '1.1rem', sm: '1.25rem' } }}
+            >
                 Selecione o tipo de ocorrência que deseja denunciar
             </Typography>
 
@@ -51,18 +55,19 @@ export default function ReportTypeForm({ onNext }: ReportTypeFormProps) {
                         <RadioGroup {...field}>
                             <Grid container spacing={2}>
                                 {Object.values(ReportType).map((type) => (
-                                    <Grid size={{ xs: 12, sm: 6 }} key={type}>
+                                    <Grid size={{ xs: 12, md: 6 }} key={type}>
                                         <FormControlLabel
                                             value={type}
                                             control={<Radio />}
                                             label={getReportTypeLabel(type)}
                                             sx={{
-                                                p: 2,
+                                                p: { xs: 1.5, sm: 2 },
                                                 border: 1,
                                                 borderColor: 'divider',
                                                 borderRadius: 2,
                                                 display: 'flex',
                                                 width: '100%',
+                                                m: 0,
                                             }}
                                         />
                                     </Grid>
@@ -76,11 +81,18 @@ export default function ReportTypeForm({ onNext }: ReportTypeFormProps) {
                 )}
             </FormControl>
 
-            <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 4 }}>
+            <Box
+                sx={{
+                    display: "flex",
+                    justifyContent: "flex-end",
+                    mt: { xs: 3, sm: 4 }
+                }}
+            >
                 <Button
                     type="submit"
                     variant="contained"
                     size="large"
+                    sx={{ width: { xs: '100%', sm: 'auto' } }}
                 >
                     Próximo
                 </Button>

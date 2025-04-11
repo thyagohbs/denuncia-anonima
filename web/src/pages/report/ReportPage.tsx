@@ -65,25 +65,43 @@ export default function ReportPage() {
 
     return (
         <Box sx={{ width: '100%' }}>
-            <Typography component="h1" variant="h4" align="center" gutterBottom>
+            <Typography
+                component="h1"
+                variant="h4"
+                align="center"
+                gutterBottom
+                sx={{ fontSize: { xs: '1.75rem', sm: '2.125rem' } }}
+            >
                 Denúncia Anônima
             </Typography>
 
             <Paper
                 elevation={3}
                 sx={{
-                    p: { xs: 2, sm: 4 },
-                    mt: 4,
-                    borderRadius: 2
+                    p: { xs: 2, sm: 3, md: 4 },
+                    mt: { xs: 2, sm: 4 },
+                    borderRadius: 2,
+                    overflow: 'hidden'
                 }}
             >
-                <Stepper activeStep={activeStep} alternativeLabel sx={{ mb: 4 }}>
-                    {steps.map((label) => (
-                        <Step key={label}>
-                            <StepLabel>{label}</StepLabel>
-                        </Step>
-                    ))}
-                </Stepper>
+                <Box sx={{ overflowX: 'auto' }}>
+                    <Stepper
+                        activeStep={activeStep}
+                        alternativeLabel
+                        sx={{
+                            mb: { xs: 2, sm: 4 },
+                            '& .MuiStepLabel-label': {
+                                fontSize: { xs: '0.75rem', sm: '0.875rem' }
+                            }
+                        }}
+                    >
+                        {steps.map((label) => (
+                            <Step key={label}>
+                                <StepLabel>{label}</StepLabel>
+                            </Step>
+                        ))}
+                    </Stepper>
+                </Box>
 
                 {activeStep === steps.length ? (
                     <Box sx={{ mt: 2 }}>

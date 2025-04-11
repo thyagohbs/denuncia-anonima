@@ -78,15 +78,22 @@ export default function ReportSubmitForm({
 
     return (
         <Box>
-            <Typography variant="h6" gutterBottom>
+            <Typography
+                variant="h6"
+                gutterBottom
+                sx={{ fontSize: { xs: '1.1rem', sm: '1.25rem' } }}
+            >
                 Resumo da Denúncia
             </Typography>
 
             <Paper
                 variant="outlined"
-                sx={{ p: 3, mb: 4, backgroundColor: "background.default" }}
+                sx={{ p: { xs: 2, sm: 3 }, mb: 4, backgroundColor: "background.default" }}
             >
-                <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 500 }}>
+                <Typography
+                    variant="subtitle1"
+                    sx={{ mb: 2, fontWeight: 500 }}
+                >
                     Detalhes da Ocorrência
                 </Typography>
 
@@ -113,7 +120,15 @@ export default function ReportSubmitForm({
                         <Typography variant="body2" color="text.secondary">
                             Descrição:
                         </Typography>
-                        <Typography variant="body1" sx={{ whiteSpace: 'pre-line' }} gutterBottom>
+                        <Typography
+                            variant="body1"
+                            sx={{
+                                whiteSpace: 'pre-line',
+                                overflowWrap: 'break-word',
+                                wordWrap: 'break-word'
+                            }}
+                            gutterBottom
+                        >
                             {formData.detalhes}
                         </Typography>
                     </Grid>
@@ -122,7 +137,14 @@ export default function ReportSubmitForm({
                         <Typography variant="body2" color="text.secondary">
                             Local:
                         </Typography>
-                        <Typography variant="body1" gutterBottom>
+                        <Typography
+                            variant="body1"
+                            gutterBottom
+                            sx={{
+                                overflowWrap: 'break-word',
+                                wordWrap: 'break-word'
+                            }}
+                        >
                             {formData.localizacao?.endereco}
                         </Typography>
                     </Grid>
@@ -132,12 +154,28 @@ export default function ReportSubmitForm({
                             <Typography variant="body2" color="text.secondary">
                                 Anexos:
                             </Typography>
-                            <List dense>
+                            <List
+                                dense
+                                sx={{
+                                    maxHeight: '200px',
+                                    overflowY: 'auto',
+                                    bgcolor: 'background.paper',
+                                    borderRadius: 1,
+                                    border: '1px solid',
+                                    borderColor: 'divider'
+                                }}
+                            >
                                 {formData.arquivos.map((file, index) => (
-                                    <ListItem key={index} disableGutters>
+                                    <ListItem key={index} disableGutters sx={{ px: 2 }}>
                                         <ListItemText
                                             primary={file.name}
                                             secondary={`${(file.size / 1024 / 1024).toFixed(2)} MB`}
+                                            primaryTypographyProps={{
+                                                sx: {
+                                                    overflowWrap: 'break-word',
+                                                    wordWrap: 'break-word'
+                                                }
+                                            }}
                                         />
                                     </ListItem>
                                 ))}
@@ -147,25 +185,51 @@ export default function ReportSubmitForm({
                 </Grid>
             </Paper>
 
-            <Divider sx={{ my: 4 }} />
+            <Divider sx={{ my: { xs: 3, sm: 4 } }} />
 
-            <Typography variant="subtitle1" gutterBottom>
+            <Typography
+                variant="subtitle1"
+                gutterBottom
+                sx={{ fontSize: { xs: '1rem', sm: '1.1rem' } }}
+            >
                 Termos e Condições
             </Typography>
 
-            <Paper variant="outlined" sx={{ p: 2, mb: 3, backgroundColor: "background.default" }}>
+            <Paper
+                variant="outlined"
+                sx={{
+                    p: { xs: 1.5, sm: 2 },
+                    mb: 3,
+                    backgroundColor: "background.default"
+                }}
+            >
                 <Typography variant="body2" color="text.secondary" paragraph>
                     Ao enviar esta denúncia, você afirma que:
                 </Typography>
                 <List dense disablePadding>
                     <ListItem disablePadding>
-                        <ListItemText primary="As informações fornecidas são verdadeiras e precisas ao seu conhecimento;" />
+                        <ListItemText
+                            primary="As informações fornecidas são verdadeiras e precisas ao seu conhecimento;"
+                            primaryTypographyProps={{
+                                sx: { fontSize: { xs: '0.875rem', sm: '1rem' } }
+                            }}
+                        />
                     </ListItem>
                     <ListItem disablePadding>
-                        <ListItemText primary="Compreende que falsas denúncias podem ter consequências legais;" />
+                        <ListItemText
+                            primary="Compreende que falsas denúncias podem ter consequências legais;"
+                            primaryTypographyProps={{
+                                sx: { fontSize: { xs: '0.875rem', sm: '1rem' } }
+                            }}
+                        />
                     </ListItem>
                     <ListItem disablePadding>
-                        <ListItemText primary="Concorda com o processamento anônimo das informações fornecidas." />
+                        <ListItemText
+                            primary="Concorda com o processamento anônimo das informações fornecidas."
+                            primaryTypographyProps={{
+                                sx: { fontSize: { xs: '0.875rem', sm: '1rem' } }
+                            }}
+                        />
                     </ListItem>
                 </List>
             </Paper>
@@ -179,16 +243,28 @@ export default function ReportSubmitForm({
                     />
                 }
                 label="Li e aceito os termos e condições"
+                sx={{ mb: 2 }}
             />
 
             {error && (
-                <Alert severity="error" sx={{ mt: 2 }}>
+                <Alert severity="error" sx={{ mt: 2, mb: 2 }}>
                     {error}
                 </Alert>
             )}
 
-            <Box sx={{ display: "flex", justifyContent: "space-between", mt: 4 }}>
-                <Button onClick={onBack} variant="outlined" disabled={isSubmitting}>
+            <Box sx={{
+                display: "flex",
+                flexDirection: { xs: 'column', sm: 'row' },
+                justifyContent: "space-between",
+                gap: 2,
+                mt: { xs: 2, sm: 4 }
+            }}>
+                <Button
+                    onClick={onBack}
+                    variant="outlined"
+                    disabled={isSubmitting}
+                    sx={{ width: { xs: '100%', sm: 'auto' } }}
+                >
                     Voltar
                 </Button>
                 <Button
@@ -196,6 +272,7 @@ export default function ReportSubmitForm({
                     variant="contained"
                     color="primary"
                     disabled={isSubmitting || !termsAccepted}
+                    sx={{ width: { xs: '100%', sm: 'auto' } }}
                 >
                     {isSubmitting ? (
                         <CircularProgress size={24} color="inherit" />

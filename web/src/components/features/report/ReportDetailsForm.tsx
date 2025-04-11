@@ -70,12 +70,16 @@ export default function ReportDetailsForm({
 
     return (
         <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate>
-            <Typography variant="h6" gutterBottom>
+            <Typography
+                variant="h6"
+                gutterBottom
+                sx={{ fontSize: { xs: '1.1rem', sm: '1.25rem' } }}
+            >
                 Detalhes da Ocorrência
             </Typography>
 
-            <Grid container spacing={3}>
-                <Grid size={{ xs: 12 }}>
+            <Grid container spacing={2}>
+                <Grid size={{ xs: 12, md: 6 }}>
                     <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ptBR}>
                         <Controller
                             name="data"
@@ -96,6 +100,7 @@ export default function ReportDetailsForm({
                                             variant: "outlined",
                                             error: !!errors.data,
                                             helperText: errors.data?.message,
+                                            margin: "normal"
                                         },
                                     }}
                                 />
@@ -119,6 +124,7 @@ export default function ReportDetailsForm({
                                 placeholder="Descreva com detalhes o que aconteceu, incluindo horário aproximado, local exato, descrição de pessoas envolvidas e outros detalhes relevantes."
                                 error={!!errors.detalhes}
                                 helperText={errors.detalhes?.message}
+                                margin="normal"
                             />
                         )}
                     />
@@ -128,48 +134,72 @@ export default function ReportDetailsForm({
                     <InputLabel htmlFor="file-input" sx={{ mb: 1 }}>
                         Evidências (opcional)
                     </InputLabel>
-                    <input
-                        accept="image/*,video/*,application/pdf"
-                        id="file-input"
-                        type="file"
-                        multiple
-                        onChange={handleFileChange}
-                        style={{ display: 'none' }}
-                    />
-                    <label htmlFor="file-input">
-                        <Button variant="outlined" component="span">
-                            Anexar arquivos
-                        </Button>
-                    </label>
-                    <Typography variant="caption" display="block" sx={{ mt: 1 }}>
-                        Formatos aceitos: imagens, vídeos e PDFs (máximo 10MB por arquivo)
-                    </Typography>
+                    <Box sx={{
+                        display: 'flex',
+                        flexDirection: { xs: 'column', sm: 'row' },
+                        alignItems: { xs: 'flex-start', sm: 'center' },
+                        gap: 1
+                    }}>
+                        <input
+                            accept="image/*,video/*,application/pdf"
+                            id="file-input"
+                            type="file"
+                            multiple
+                            onChange={handleFileChange}
+                            style={{ display: 'none' }}
+                        />
+                        <label htmlFor="file-input">
+                            <Button variant="outlined" component="span" fullWidth={false}>
+                                Anexar arquivos
+                            </Button>
+                        </label>
+                        <Typography variant="caption" display="block">
+                            Formatos aceitos: imagens, vídeos e PDFs (máximo 10MB por arquivo)
+                        </Typography>
+                    </Box>
 
                     {selectedFiles.length > 0 && (
                         <Box sx={{ mt: 2 }}>
                             <Typography variant="subtitle2" gutterBottom>
                                 Arquivos selecionados:
                             </Typography>
-                            {selectedFiles.map((file, index) => (
-                                <Alert
-                                    key={index}
-                                    severity="info"
-                                    sx={{ mb: 1 }}
-                                    onClose={() => removeFile(index)}
-                                >
-                                    {file.name} ({(file.size / 1024 / 1024).toFixed(2)} MB)
-                                </Alert>
-                            ))}
+                            <Box sx={{ maxHeight: '200px', overflowY: 'auto' }}>
+                                {selectedFiles.map((file, index) => (
+                                    <Alert
+                                        key={index}
+                                        severity="info"
+                                        sx={{ mb: 1 }}
+                                        onClose={() => removeFile(index)}
+                                    >
+                                        {file.name} ({(file.size / 1024 / 1024).toFixed(2)} MB)
+                                    </Alert>
+                                ))}
+                            </Box>
                         </Box>
                     )}
                 </Grid>
             </Grid>
 
-            <Box sx={{ display: "flex", justifyContent: "space-between", mt: 4 }}>
-                <Button onClick={onBack} variant="outlined">
+            <Box sx={{
+                display: "flex",
+                flexDirection: { xs: 'column', sm: 'row' },
+                justifyContent: "space-between",
+                gap: 2,
+                mt: 4
+            }}>
+                <Button
+                    onClick={onBack}
+                    variant="outlined"
+                    fullWidth={false}
+                    sx={{ width: { xs: '100%', sm: 'auto' } }}
+                >
                     Voltar
                 </Button>
-                <Button type="submit" variant="contained">
+                <Button
+                    type="submit"
+                    variant="contained"
+                    sx={{ width: { xs: '100%', sm: 'auto' } }}
+                >
                     Próximo
                 </Button>
             </Box>

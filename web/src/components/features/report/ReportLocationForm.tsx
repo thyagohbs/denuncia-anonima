@@ -12,7 +12,7 @@ import {
 } from "@mui/material";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import useReportStore, { Location } from "../../../store/useReportStore";
+import useReportStore from "../../../store/useReportStore";
 import MyLocationIcon from "@mui/icons-material/MyLocation";
 import * as z from "zod";
 import { useGeocode } from "../../../hooks/useGeocode";
@@ -138,11 +138,15 @@ export default function ReportLocationForm({
 
     return (
         <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate>
-            <Typography variant="h6" gutterBottom>
+            <Typography
+                variant="h6"
+                gutterBottom
+                sx={{ fontSize: { xs: '1.1rem', sm: '1.25rem' } }}
+            >
                 Local da Ocorrência
             </Typography>
 
-            <Grid container spacing={3}>
+            <Grid container spacing={2}>
                 <Grid size={{ xs: 12 }}>
                     <Controller
                         name="endereco"
@@ -156,6 +160,7 @@ export default function ReportLocationForm({
                                 placeholder="Rua, número, bairro, cidade"
                                 error={!!errors.endereco}
                                 helperText={errors.endereco?.message}
+                                margin="normal"
                                 InputProps={{
                                     endAdornment: (
                                         <InputAdornment position="end">
@@ -186,6 +191,7 @@ export default function ReportLocationForm({
                                 fullWidth
                                 label="Latitude"
                                 variant="outlined"
+                                margin="normal"
                                 InputProps={{
                                     readOnly: true,
                                 }}
@@ -204,6 +210,7 @@ export default function ReportLocationForm({
                                 fullWidth
                                 label="Longitude"
                                 variant="outlined"
+                                margin="normal"
                                 InputProps={{
                                     readOnly: true,
                                 }}
@@ -234,14 +241,26 @@ export default function ReportLocationForm({
                 </Grid>
             </Grid>
 
-            <Box sx={{ display: "flex", justifyContent: "space-between", mt: 4 }}>
-                <Button onClick={onBack} variant="outlined">
+            <Box sx={{
+                display: "flex",
+                flexDirection: { xs: 'column', sm: 'row' },
+                justifyContent: "space-between",
+                gap: 2,
+                mt: 4
+            }}>
+                <Button
+                    onClick={onBack}
+                    variant="outlined"
+                    fullWidth={false}
+                    sx={{ width: { xs: '100%', sm: 'auto' } }}
+                >
                     Voltar
                 </Button>
                 <Button
                     type="submit"
                     variant="contained"
                     disabled={isLoading || locating}
+                    sx={{ width: { xs: '100%', sm: 'auto' } }}
                 >
                     {isLoading ? <CircularProgress size={24} /> : "Próximo"}
                 </Button>

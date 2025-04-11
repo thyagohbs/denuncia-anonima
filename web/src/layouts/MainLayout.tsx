@@ -70,38 +70,56 @@ export default function MainLayout() {
                 }}
             >
                 <Container maxWidth="xl">
-                    <Toolbar disableGutters>
-                        <IconButton
-                            color="inherit"
-                            edge="start"
-                            onClick={handleDrawerToggle}
-                            sx={{ mr: 2, display: { md: 'none' } }}
-                        >
-                            <MenuIcon />
-                        </IconButton>
+                    <Toolbar
+                        disableGutters
+                        sx={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            flexWrap: 'nowrap'
+                        }}
+                    >
+                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                            <IconButton
+                                color="inherit"
+                                edge="start"
+                                onClick={handleDrawerToggle}
+                                sx={{ mr: 1, display: { md: 'none' } }}
+                            >
+                                <MenuIcon />
+                            </IconButton>
 
-                        <Typography
-                            variant="h6"
-                            noWrap
-                            component={RouterLink}
-                            to="/"
+                            <Typography
+                                variant="h6"
+                                noWrap
+                                component={RouterLink}
+                                to="/"
+                                sx={{
+                                    fontWeight: 700,
+                                    color: 'inherit',
+                                    textDecoration: 'none',
+                                    fontSize: { xs: '1rem', sm: '1.25rem' }
+                                }}
+                            >
+                                Denúncia Anônima
+                            </Typography>
+                        </Box>
+
+                        <Box
                             sx={{
-                                mr: 2,
-                                fontWeight: 700,
-                                color: 'inherit',
-                                textDecoration: 'none',
+                                display: { xs: 'none', md: 'flex' },
+                                ml: 'auto',
+                                flexShrink: 0
                             }}
                         >
-                            Denúncia Anônima
-                        </Typography>
-
-                        <Box sx={{ display: { xs: 'none', md: 'flex' }, ml: 'auto' }}>
                             {navigation.map((item) => (
                                 <ListItemButton
                                     key={item.title}
                                     component={RouterLink}
                                     to={item.path}
-                                    sx={{ borderRadius: 1 }}
+                                    sx={{
+                                        borderRadius: 1,
+                                        px: { md: 1.5, lg: 2 }
+                                    }}
                                 >
                                     <ListItemText primary={item.title} />
                                 </ListItemButton>
@@ -144,13 +162,19 @@ export default function MainLayout() {
                 component="main"
                 sx={{
                     flexGrow: 1,
-                    p: 3,
-                    width: { md: `calc(100% - 240px)` },
+                    p: { xs: 2, sm: 3 },
+                    width: { xs: '100%', md: `calc(100% - 240px)` },
                     minHeight: '100vh',
                     pt: { xs: 8, sm: 9 },
                 }}
             >
-                <Container maxWidth="lg" sx={{ py: 4 }}>
+                <Container
+                    maxWidth="lg"
+                    sx={{
+                        py: { xs: 2, sm: 3, md: 4 },
+                        px: { xs: 1, sm: 2, md: 3 }
+                    }}
+                >
                     <Outlet />
                 </Container>
             </Box>

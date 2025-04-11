@@ -1,4 +1,4 @@
-import { Box, Typography, Paper, Button, Alert, Divider, Link } from "@mui/material";
+import { Box, Typography, Paper, Button, Alert } from "@mui/material";
 import { Link as RouterLink } from "react-router-dom";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
@@ -11,111 +11,97 @@ interface ReportSuccessProps {
 export default function ReportSuccess({ protocol }: ReportSuccessProps) {
     const [copied, setCopied] = useState(false);
 
-    const handleCopyProtocol = () => {
-        if (protocol) {
-            navigator.clipboard.writeText(protocol).then(() => {
-                setCopied(true);
-                setTimeout(() => setCopied(false), 3000);
-            });
-        }
+    const handleCopyClick = () => {
+        navigator.clipboard.writeText(protocol);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 3000);
     };
 
     return (
-        <Box
-            sx={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                textAlign: "center",
-            }}
-        >
+        <Box sx={{ textAlign: 'center', py: { xs: 2, sm: 3 } }}>
             <CheckCircleIcon
                 color="success"
-                sx={{ fontSize: 80, mb: 2 }}
+                sx={{ fontSize: { xs: 60, sm: 80 }, mb: 2 }}
             />
 
-            <Typography variant="h5" gutterBottom>
-                Denúncia Recebida com Sucesso
+            <Typography
+                variant="h5"
+                component="h1"
+                gutterBottom
+                sx={{ fontSize: { xs: '1.5rem', sm: '1.8rem' } }}
+            >
+                Denúncia Enviada com Sucesso!
             </Typography>
 
-            <Typography variant="body1" paragraph>
-                Sua denúncia foi registrada de forma anônima e será analisada por nossa equipe.
-            </Typography>
-
-            {protocol && (
-                <Paper
-                    elevation={0}
-                    sx={{
-                        p: 3,
-                        mt: 2,
-                        mb: 4,
-                        backgroundColor: "background.default",
-                        width: "100%",
-                        maxWidth: 500,
-                        borderRadius: 2,
-                        border: 1,
-                        borderColor: "divider",
-                    }}
-                >
-                    <Typography variant="subtitle2" color="text.secondary">
-                        Número de protocolo:
+            <Alert
+                severity="success"
+                sx={{
+                    mb: 3,
+                    mx: 'auto',
+                    maxWidth: '100%',
+                    display: 'flex',
+                    flexDirection: { xs: 'column', sm: 'row' },
+                    alignItems: 'center'
+                }}
+            >
+                <Box sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    width: '100%',
+                    justifyContent: 'space-between'
+                }}>
+                    <Typography component="span" variant="body1">
+                        <strong>Protocolo:</strong> {protocol}
                     </Typography>
-
-                    <Box
-                        sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            gap: 1,
-                            mt: 1
-                        }}
+                    <Button
+                        startIcon={<ContentCopyIcon />}
+                        size="small"
+                        onClick={handleCopyClick}
+                        sx={{ ml: { xs: 0, sm: 2 }, mt: { xs: 1, sm: 0 } }}
                     >
-                        <Typography variant="h6" component="span" sx={{ fontFamily: "monospace" }}>
-                            {protocol}
-                        </Typography>
-
-                        <Button
-                            size="small"
-                            startIcon={<ContentCopyIcon />}
-                            onClick={handleCopyProtocol}
-                            sx={{ ml: 2 }}
-                        >
-                            Copiar
-                        </Button>
-                    </Box>
-
-                    {copied && (
-                        <Alert severity="success" sx={{ mt: 2 }}>
-                            Protocolo copiado para a área de transferência
-                        </Alert>
-                    )}
-                </Paper>
-            )}
-
-            <Alert severity="info" sx={{ mt: 2, mb: 4, width: "100%", maxWidth: 500 }}>
-                Guarde seu número de protocolo para consultar o andamento da sua denúncia.
-                Por segurança, não enviamos este número por e-mail.
+                        {copied ? "Copiado!" : "Copiar"}
+                    </Button>
+                </Box>
             </Alert>
 
-            <Divider sx={{ width: "100%", mb: 4 }} />
+            <Paper
+                elevation={2}
+                sx={{
+                    p: { xs: 2, sm: 3 },
+                    mb: 3,
+                    textAlign: 'left',
+                    borderRadius: 2
+                }}
+            >
+                <Typography variant="body1" paragraph>
+                    <strong>Importante:</strong>
+                </Typography>
+                <Typography
+                    variant="body2"
+                    component="div"
+                    sx={{ mb: 2 }}
+                >
+                    1. Anote o número de protocolo para acompanhar sua denúncia.
+                    <br />
+                    2. Este é o único momento em que você verá este número.
+                    <br />
+                    3. Você pode acompanhar o status da denúncia utilizando o protocolo na página de consulta.
+                </Typography>
+            </Paper>
 
-            <Typography variant="subtitle1" gutterBottom>
-                O que acontece agora?
-            </Typography>
-
-            <Typography variant="body2" paragraph align="left">
-                1. Sua denúncia será analisada por nossa equipe especializada em até 48 horas úteis.
-                <br />
-                2. Se necessário, poderemos solicitar informações adicionais, que serão requisitadas via sistema.
-                <br />
-                3. Você pode acompanhar o status da denúncia utilizando o protocolo na página de consulta.
-            </Typography>
-
-            <Box sx={{ mt: 4, display: "flex", gap: 2 }}>
+            <Box sx={{
+                mt: 4,
+                display: "flex",
+                flexDirection: { xs: 'column', sm: 'row' },
+                gap: 2,
+                justifyContent: 'center'
+            }}>
                 <Button
                     component={RouterLink}
                     to="/track"
                     variant="contained"
+                    fullWidth={false}
+                    sx={{ width: { xs: '100%', sm: 'auto' } }}
                 >
                     Consultar Denúncia
                 </Button>
@@ -124,6 +110,8 @@ export default function ReportSuccess({ protocol }: ReportSuccessProps) {
                     component={RouterLink}
                     to="/"
                     variant="outlined"
+                    fullWidth={false}
+                    sx={{ width: { xs: '100%', sm: 'auto' } }}
                 >
                     Voltar à Página Inicial
                 </Button>
