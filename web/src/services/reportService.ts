@@ -1,19 +1,18 @@
 import { useState } from "react";
-import api from "./api";
+import api, { submitAnonymousReport, ReportData } from "./api";
 import { ReportFormData } from "../store/useReportStore";
 
 interface SubmitReportResult {
   success: boolean;
-  protocol: string;
+  protocol?: string;
+  error?: string;
 }
 
 interface TrackReportResult {
   status: string;
   lastUpdate: string;
-  details?: string;
+  details: string;
 }
-
-// Função para gerar protocolo aleatório (apenas para ambiente de desenvolvimento)
 
 export function useReportService() {
   const [loading, setLoading] = useState(false);
@@ -27,18 +26,19 @@ export function useReportService() {
 
     try {
       // Preparar apenas os dados essenciais da denúncia
-      const reportData = {
+      // Convertendo localizacao para string conforme esperado pela interface ReportData
+      const reportData: ReportData = {
         tipo: data.tipo,
         detalhes: data.detalhes,
-        localizacao: data.localizacao,
+        localizacao: data.localizacao ? JSON.stringify(data.localizacao) : "",
       };
 
-      // Enviar para o backend de forma anônima
-      const response = await api.post("/reports", reportData);
+      // Usar a função específica para envio anônimo
+      const response = await submitAnonymousReport(reportData);
 
       return {
         success: true,
-        protocol: response.data.protocolo,
+        protocol: response.protocolo,
       };
     } catch (err) {
       const message =
