@@ -6,7 +6,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Box, Typography, Button, Container, Paper, Avatar, Rating } from '@mui/material';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-import ShieldIcon from '@mui/icons-material/Shield';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import SupportAgentIcon from '@mui/icons-material/SupportAgent';
 import SecurityIcon from '@mui/icons-material/Security';
@@ -89,15 +88,15 @@ export default function HeroCarousel() {
                 tabIndex={0}
                 sx={{
                     position: 'absolute',
-                    left: { xs: '10px', md: '40px' },
+                    left: { xs: '5px', md: '40px' },
                     top: '50%',
                     transform: 'translateY(-50%)',
                     zIndex: 10,
                     color: 'text.primary',
                     bgcolor: 'background.paper',
                     borderRadius: '50%',
-                    width: { xs: 40, md: 50 },
-                    height: { xs: 40, md: 50 },
+                    width: { xs: 48, md: 50 }, // Aumentando área de toque mínima para 48px
+                    height: { xs: 48, md: 50 },
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -107,6 +106,10 @@ export default function HeroCarousel() {
                     '&:hover': {
                         bgcolor: 'primary.light',
                         color: 'primary.contrastText',
+                    },
+                    // Melhorar acessibilidade em dispositivos touch
+                    '&:active': {
+                        transform: 'translateY(-50%) scale(0.95)',
                     }
                 }}
             >

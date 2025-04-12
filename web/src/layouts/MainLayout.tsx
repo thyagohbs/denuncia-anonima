@@ -40,7 +40,10 @@ export default function MainLayout() {
     };
 
     const drawer = (
-        <Box sx={{ mt: 2 }}>
+        <Box sx={{
+            mt: 2,
+            width: { xs: '100%', sm: 250 }, // Largura total em dispositivos pequenos
+        }}>
             <List>
                 {navigation.map((item) => (
                     <ListItem key={item.title} disablePadding>
@@ -48,9 +51,21 @@ export default function MainLayout() {
                             component={RouterLink}
                             to={item.path}
                             onClick={() => isMobile && setMobileOpen(false)}
+                            sx={{
+                                py: { xs: 1.5, sm: 1 }, // Padding vertical maior em mobile
+                                px: { xs: 3, sm: 2 },
+                                '&:active': {
+                                    bgcolor: 'rgba(0,0,0,0.1)', // Feedback visual em dispositivos touch
+                                }
+                            }}
                         >
-                            <ListItemIcon>{item.icon}</ListItemIcon>
-                            <ListItemText primary={item.title} />
+                            <ListItemIcon sx={{ minWidth: { xs: 42, sm: 36 } }}>{item.icon}</ListItemIcon>
+                            <ListItemText
+                                primary={item.title}
+                                primaryTypographyProps={{
+                                    fontSize: { xs: '1rem', sm: '0.875rem' }
+                                }}
+                            />
                         </ListItemButton>
                     </ListItem>
                 ))}
@@ -75,7 +90,8 @@ export default function MainLayout() {
                         sx={{
                             display: 'flex',
                             justifyContent: 'space-between',
-                            flexWrap: 'nowrap'
+                            flexWrap: 'nowrap',
+                            minHeight: { xs: '64px', sm: '70px' } // Aumentando altura mínima
                         }}
                     >
                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -83,9 +99,14 @@ export default function MainLayout() {
                                 color="inherit"
                                 edge="start"
                                 onClick={handleDrawerToggle}
-                                sx={{ mr: 1, display: { md: 'none' } }}
+                                aria-label="abrir menu"
+                                sx={{
+                                    mr: 1,
+                                    display: { md: 'none' },
+                                    padding: '12px', // Aumentando área de toque
+                                }}
                             >
-                                <MenuIcon />
+                                <MenuIcon sx={{ fontSize: '28px' }} />
                             </IconButton>
 
                             <Typography
@@ -137,10 +158,16 @@ export default function MainLayout() {
                     variant="temporary"
                     open={mobileOpen}
                     onClose={handleDrawerToggle}
-                    ModalProps={{ keepMounted: true }}
+                    ModalProps={{
+                        keepMounted: true, // Melhor desempenho em dispositivos móveis
+                    }}
                     sx={{
                         display: { xs: 'block', md: 'none' },
-                        '& .MuiDrawer-paper': { width: 240, boxSizing: 'border-box' },
+                        '& .MuiDrawer-paper': {
+                            boxSizing: 'border-box',
+                            width: { xs: '85%', sm: 250 },
+                            boxShadow: 3
+                        },
                     }}
                 >
                     {drawer}

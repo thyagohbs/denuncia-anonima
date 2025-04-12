@@ -93,12 +93,17 @@ let theme = createTheme({
           borderRadius: 8,
           textTransform: "none",
           fontWeight: 500,
+          // Garantir tamanho mínimo recomendado para touch targets
+          minHeight: "48px",
+          "@media (max-width: 600px)": {
+            minWidth: "48px",
+          },
         },
         // Adicionando tamanhos responsivos para botões
         sizeLarge: {
-          padding: "10px 22px",
+          padding: "12px 22px", // Aumenta area de toque
           "@media (max-width: 600px)": {
-            padding: "8px 16px",
+            padding: "12px 16px",
           },
         },
       },
@@ -136,6 +141,25 @@ let theme = createTheme({
       styleOverrides: {
         root: {
           boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+        },
+      },
+    },
+    MuiBottomNavigation: {
+      styleOverrides: {
+        root: {
+          height: 65, // Altura maior para melhor área de toque
+        },
+      },
+    },
+    MuiBottomNavigationAction: {
+      styleOverrides: {
+        root: {
+          padding: "12px 0",
+          minWidth: "auto",
+          "@media (max-width: 600px)": {
+            paddingTop: "10px",
+            paddingBottom: "10px",
+          },
         },
       },
     },

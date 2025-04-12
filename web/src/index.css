@@ -67,12 +67,45 @@ button:focus-visible {
   input, select, textarea {
     font-size: 16px !important; /* Evita zoom no iOS */
   }
+  
+  /* Melhorar espaçamento de toque */
+  button, 
+  a.MuiButtonBase-root {
+    padding: 12px !important;
+    min-height: 48px !important;
+  }
+  
+  /* Evitar sobreposição de conteúdo com a barra de navegação móvel */
+  .content-container {
+    padding-bottom: 80px;
+  }
 }
 
 /* Responsividade para telas muito pequenas */
 @media (max-width: 340px) {
   html {
     font-size: 14px;
+  }
+  
+  h1 {
+    font-size: 2.5rem !important;
+  }
+  
+  h2 {
+    font-size: 2rem !important;
+  }
+}
+
+/* Destacar elementos focados - acessibilidade */
+:focus {
+  outline: 2px solid #1976d2 !important;
+  outline-offset: 2px !important;
+}
+
+/* Ajustes para eventos de toque */
+@media (hover: none) {
+  a:hover, button:hover {
+    transition: none !important;
   }
 }
 
