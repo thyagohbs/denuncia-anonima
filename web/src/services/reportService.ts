@@ -1,19 +1,19 @@
 import { useState } from "react";
 import api from "./api";
-import useReportStore, { ReportFormData } from "../store/useReportStore";
-import { generateRandomProtocol } from "../utils/protocolGenerator";
+import { ReportFormData } from "../store/useReportStore";
 
 interface SubmitReportResult {
   success: boolean;
   protocol: string;
-  message?: string;
 }
 
 interface TrackReportResult {
-  status: "RECEIVED" | "ANALYSIS" | "FORWARDED" | "CLOSED";
+  status: string;
   lastUpdate: string;
   details?: string;
 }
+
+// Função para gerar protocolo aleatório (apenas para ambiente de desenvolvimento)
 
 export function useReportService() {
   const [loading, setLoading] = useState(false);
@@ -26,41 +26,19 @@ export function useReportService() {
     setError(null);
 
     try {
-      // Preparar os dados para upload (incluindo arquivos)
-      const formData = new FormData();
+      // Preparar apenas os dados essenciais da denúncia
+      const reportData = {
+        tipo: data.tipo,
+        detalhes: data.detalhes,
+        localizacao: data.localizacao,
+      };
 
-      // Adicionar dados básicos
-      formData.append("tipo", data.tipo);
-      formData.append("detalhes", data.detalhes);
-      formData.append("data", data.data);
-
-      // Adicionar localização
-      if (data.localizacao) {
-        formData.append("localizacao", JSON.stringify(data.localizacao));
-      }
-
-      // Adicionar arquivos
-      if (data.arquivos && data.arquivos.length > 0) {
-        data.arquivos.forEach((file, index) => {
-          formData.append(`arquivo_${index}`, file);
-        });
-      }
-
-      // Em um ambiente real, envie para o backend
-      // const response = await api.post('/reports', formData, {
-      //   headers: { 'Content-Type': 'multipart/form-data' }
-      // });
-      // return response.data;
-
-      // Simulando envio (remova em produção)
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      // Gerar um protocolo de teste (em produção, viria do backend)
-      const protocol = generateRandomProtocol();
+      // Enviar para o backend de forma anônima
+      const response = await api.post("/reports", reportData);
 
       return {
         success: true,
-        protocol,
+        protocol: response.data.protocolo,
       };
     } catch (err) {
       const message =
@@ -77,30 +55,11 @@ export function useReportService() {
     setError(null);
 
     try {
-      // Em um ambiente real, consulte o backend
-      // const response = await api.get(`/reports/track/${protocol}`);
-      // return response.data;
-
-      // Simulando consulta (remova em produção)
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Status aleatório para demonstração
-      const statuses: TrackReportResult["status"][] = [
-        "RECEIVED",
-        "ANALYSIS",
-        "FORWARDED",
-        "CLOSED",
-      ];
-      const randomStatus =
-        statuses[Math.floor(Math.random() * statuses.length)];
-
+      const response = await api.get(`/reports/protocolo/${protocol}`);
       return {
-        status: randomStatus,
-        lastUpdate: new Date().toISOString(),
-        details:
-          randomStatus === "CLOSED"
-            ? "Denúncia analisada e encaminhada aos órgãos competentes."
-            : undefined,
+        status: response.data.status,
+        lastUpdate: response.data.atualizadoEm,
+        details: response.data.detalhes,
       };
     } catch (err) {
       const message =

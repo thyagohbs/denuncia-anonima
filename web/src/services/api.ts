@@ -1,42 +1,20 @@
-import axios, {
-  AxiosResponse,
-  AxiosError,
-  InternalAxiosRequestConfig,
-} from "axios";
+import axios, { AxiosError } from "axios";
 import { env } from "../config/env";
 
-// Criando instância do Axios com base na variável de ambiente
-const api = axios.create({
-  baseURL: env.apiUrl,
+const API_URL = env.isDevelopment
+  ? "http://localhost:3000"
+  : process.env.REACT_APP_API_URL;
+
+export const api = axios.create({
+  baseURL: API_URL,
   headers: {
     "Content-Type": "application/json",
   },
 });
 
-// Interceptor para logs em ambiente de desenvolvimento
-api.interceptors.request.use(
-  (config: InternalAxiosRequestConfig) => {
-    if (env.isDevelopment) {
-      console.log(
-        `[API REQUEST] ${config.method?.toUpperCase()} ${config.url}`
-      );
-    }
-    const token = localStorage.getItem("token");
-
-    // Se houver token, inclui no header de autorização
-    if (token && config.headers) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-
-    return config;
-  },
-  (error: AxiosError) => {
-    return Promise.reject(error);
-  }
-);
-
+// Interceptor para logs em desenvolvimento e tratamento básico de erros
 api.interceptors.response.use(
-  (response: AxiosResponse) => {
+  (response) => {
     if (env.isDevelopment) {
       console.log(
         `[API RESPONSE] Status: ${response.status} - ${response.config.url}`
@@ -51,31 +29,10 @@ api.interceptors.response.use(
       );
       console.error(error.response?.data || error.message);
     }
-    // Tratamento centralizado de erros
-    if (error.response) {
-      // Erros com resposta do servidor
-      const status = error.response.status;
 
-      if (status === 401) {
-        // Não autorizado - pode redirecionar para login ou renovar token
-        localStorage.removeItem("token");
-      }
-
-      if (status === 403) {
-        // Acesso proibido
-        console.error("Acesso proibido");
-      }
-
-      if (status === 500) {
-        // Erro interno do servidor
-        console.error("Erro interno do servidor");
-      }
-    } else if (error.request) {
-      // Sem resposta do servidor
-      console.error("Não foi possível conectar ao servidor");
-    } else {
-      // Erro na configuração da requisição
-      console.error("Erro ao configurar requisição", error.message);
+    // Tratamento básico de erros (sem autenticação)
+    if (error.response?.status === 500) {
+      console.error("Erro interno do servidor");
     }
 
     return Promise.reject(error);

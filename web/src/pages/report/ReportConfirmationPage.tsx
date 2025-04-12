@@ -1,26 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-    Container,
-    Typography,
-    Box,
-    Button,
-    Paper,
-    Stepper,
-    Step,
-    StepLabel,
-    List,
-    ListItem,
-    ListItemText,
-    Divider,
-    Alert,
-    CircularProgress
+    Container, Typography, Box, Button, Paper,
+    Stepper, Step, StepLabel, List, ListItem,
+    ListItemText, Divider, Alert, CircularProgress
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import SendIcon from '@mui/icons-material/Send';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import api from '../../services/api';
-import axios from 'axios';
 
 // Passos do processo de denúncia
 const steps = ['Tipo de Denúncia', 'Localização', 'Detalhes', 'Confirmação'];
@@ -87,7 +75,7 @@ export default function ReportConfirmationPage() {
             setProtocol(response.data.protocolo);
             setSuccess(true);
 
-            // Limpar dados do formulário
+            // Limpar TODOS os dados do formulário
             sessionStorage.removeItem('reportType');
             sessionStorage.removeItem('reportLocation');
             sessionStorage.removeItem('reportAddress');
@@ -98,13 +86,9 @@ export default function ReportConfirmationPage() {
                 navigate('/track', { state: { protocol: response.data.protocolo } });
             }, 5000);
 
-        } catch (err: unknown) {
+        } catch (err: any) {
             console.error('Erro ao enviar denúncia:', err);
-            if (axios.isAxiosError(err)) {
-                setError(err.response?.data?.message || 'Ocorreu um erro ao enviar sua denúncia. Por favor, tente novamente.');
-            } else {
-                setError('Ocorreu um erro ao enviar sua denúncia. Por favor, tente novamente.');
-            }
+            setError('Ocorreu um erro ao enviar sua denúncia. Por favor, tente novamente.');
         } finally {
             setLoading(false);
         }
@@ -147,7 +131,8 @@ export default function ReportConfirmationPage() {
                             </Typography>
 
                             <Typography variant="body2" color="text.secondary" paragraph>
-                                Guarde este número para acompanhar o andamento da sua denúncia. Você será redirecionado em alguns segundos para a página de consulta.
+                                Guarde este número para acompanhar o andamento da sua denúncia.
+                                Você será redirecionado em alguns segundos para a página de consulta.
                             </Typography>
 
                             <Button

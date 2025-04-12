@@ -70,7 +70,7 @@ export default function TrackReportPage() {
         setReport(null);
 
         try {
-            const response = await api.get(`/reports/protocol/${protocol}`);
+            const response = await api.get(`/reports/protocolo/${protocol}`);
             setReport(response.data);
         } catch (err: unknown) {
             console.error('Erro ao buscar denúncia:', err);
@@ -125,12 +125,13 @@ export default function TrackReportPage() {
                         />
                         <Button
                             variant="contained"
-                            startIcon={loading ? <CircularProgress size={20} color="inherit" /> : <SearchIcon />}
+                            color="primary"
                             onClick={() => handleSearch()}
                             disabled={loading}
-                            sx={{ py: 1.8 }}
+                            startIcon={loading ? <CircularProgress size={20} color="inherit" /> : <SearchIcon />}
+                            sx={{ height: 56 }}
                         >
-                            {loading ? 'Buscando...' : 'Buscar'}
+                            Buscar
                         </Button>
                     </Box>
 
@@ -141,15 +142,21 @@ export default function TrackReportPage() {
                     )}
                 </Paper>
 
+                {loading && (
+                    <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+                        <CircularProgress />
+                    </Box>
+                )}
+
                 {report && (
                     <Paper elevation={2} sx={{ p: { xs: 2, sm: 4 }, borderRadius: 2 }}>
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                            <Typography variant="h6">
-                                Denúncia #{report.protocolo}
+                            <Typography variant="h5" component="h2">
+                                Protocolo: {report.protocolo}
                             </Typography>
                             <Chip
                                 label={statusLabels[report.status] || report.status}
-                                color={statusColors[report.status] || "default"}
+                                color={statusColors[report.status] || 'default'}
                             />
                         </Box>
 
@@ -184,7 +191,8 @@ export default function TrackReportPage() {
 
                         <Alert severity="info" sx={{ mt: 3 }}>
                             <Typography variant="body2">
-                                Acompanhe regularmente o status da sua denúncia utilizando o número de protocolo fornecido. As atualizações serão refletidas nesta página.
+                                Acompanhe regularmente o status da sua denúncia utilizando o número de protocolo fornecido.
+                                As atualizações serão refletidas nesta página.
                             </Typography>
                         </Alert>
                     </Paper>

@@ -1,50 +1,66 @@
 import { useState, useEffect } from "react";
-import {
-    Box,
-    Button,
-    TextField,
-    Typography,
-    Grid,
-    CircularProgress,
-    Alert,
-    InputAdornment,
-    IconButton,
-} from "@mui/material";
-import { Controller, useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import useReportStore from "../../../store/useReportStore";
-import MyLocationIcon from "@mui/icons-material/MyLocation";
 import * as z from "zod";
-import { useGeocode } from "../../../hooks/useGeocode";
+import { Box, Typography, Grid, TextField, Button, Autocomplete, CircularProgress, Alert } from "@mui/material";
+import LocationOnIcon from "@mui/icons-material/LocationOn";
+import useReportStore from "../../../store/useReportStore";
 
-// Esquema de validação
 const schema = z.object({
-    endereco: z.string().min(5, "Informe um endereço válido"),
+    endereco: z.string().optional(),
     latitude: z.number().optional(),
     longitude: z.number().optional(),
 });
 
-type FormValues = {
-    endereco: string;
-    latitude?: number;
-    longitude?: number;
-};
+type FormValues = z.infer<typeof schema>;
 
 interface ReportLocationFormProps {
     onNext: () => void;
     onBack: () => void;
 }
 
+// Simulação de serviço de geocodificação
+const geocode = async () => {
+    // Em um ambiente real, aqui você usaria uma API como Google Places ou MapBox
+    // Para fins de demonstração, vamos simular uma resposta após um pequeno delay
+    await new Promise(resolve => setTimeout(resolve, 500));
+    return { lat: Math.random() * 90, lng: Math.random() * 180 };
+};
+
+// Simulação de serviço de geocodificação reversa
+const reverseGeocode = async (lat: number, lng: number) => {
+    // Simular chamada a API de geocodificação reversa
+    await new Promise(resolve => setTimeout(resolve, 500));
+    return `Endereço encontrado para coordenadas (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
+};
+
+// Simulação de sugestões de endereço
+const getAddressSuggestions = async (input: string): Promise<string[]> => {
+    // Simular chamada a API de sugestões
+    await new Promise(resolve => setTimeout(resolve, 300));
+    if (!input) return [];
+
+    return [
+        `${input}, Centro`,
+        `${input}, Zona Norte`,
+        `${input}, Zona Sul`,
+        `${input}, Zona Leste`,
+        `${input}, Zona Oeste`,
+    ];
+};
+
 export default function ReportLocationForm({
     onNext,
     onBack,
 }: ReportLocationFormProps) {
     const { formData, updateFormData } = useReportStore();
-    const { geocode, isLoading, error: geocodeError } = useGeocode();
-    const [locationError, setLocationError] = useState<string | null>(null);
     const [locating, setLocating] = useState(false);
+    const [locationError, setLocationError] = useState<string | null>(null);
+    const [addressSuggestions, setAddressSuggestions] = useState<string[]>([]);
+    const [loadingSuggestions, setLoadingSuggestions] = useState(false);
+    const [inputValue, setInputValue] = useState('');
 
-    const { control, handleSubmit, setValue, formState: { errors }, watch } = useForm<FormValues>({
+    const { control, handleSubmit, setValue, watch } = useForm<FormValues>({
         resolver: zodResolver(schema),
         defaultValues: {
             endereco: formData.localizacao?.endereco || "",
@@ -54,12 +70,37 @@ export default function ReportLocationForm({
     });
 
     const watchedAddress = watch("endereco");
-    const watchedLat = watch("latitude");
-    const watchedLng = watch("longitude");
 
-    // Se o usuário mudou o endereço, limpe as coordenadas
+    // Efeito para buscar sugestões de endereço quando o usuário digita
     useEffect(() => {
-        if (watchedAddress && watchedAddress !== formData.localizacao?.endereco) {
+        if (!inputValue) {
+            setAddressSuggestions([]);
+            return;
+        }
+
+        const fetchSuggestions = async () => {
+            setLoadingSuggestions(true);
+            try {
+                const suggestions = await getAddressSuggestions(inputValue);
+                setAddressSuggestions(suggestions);
+            } catch (error) {
+                console.error("Erro ao buscar sugestões:", error);
+            } finally {
+                setLoadingSuggestions(false);
+            }
+        };
+
+        // Debounce para evitar chamadas excessivas
+        const timer = setTimeout(() => {
+            fetchSuggestions();
+        }, 300);
+
+        return () => clearTimeout(timer);
+    }, [inputValue]);
+
+    // Reset das coordenadas quando o endereço muda manualmente
+    useEffect(() => {
+        if (watchedAddress !== formData.localizacao?.endereco) {
             setValue("latitude", undefined);
             setValue("longitude", undefined);
         }
@@ -70,11 +111,11 @@ export default function ReportLocationForm({
         if (!data.latitude || !data.longitude) {
             try {
                 setLocationError(null);
-                const coords = await geocode(data.endereco);
+                const coords = await geocode(data.endereco || '');
                 if (coords) {
                     updateFormData({
                         localizacao: {
-                            endereco: data.endereco,
+                            endereco: data.endereco || '',
                             latitude: coords.lat,
                             longitude: coords.lng,
                         },
@@ -90,7 +131,7 @@ export default function ReportLocationForm({
         // Se já tem coordenadas
         updateFormData({
             localizacao: {
-                endereco: data.endereco,
+                endereco: data.endereco || '',
                 latitude: data.latitude,
                 longitude: data.longitude,
             },
@@ -147,131 +188,76 @@ export default function ReportLocationForm({
             </Typography>
 
             <Grid container spacing={2}>
-                <Grid size={{ xs: 12 }}>
+                <Grid size={{ xs: 12 }} >
                     <Controller
                         name="endereco"
                         control={control}
                         render={({ field }) => (
-                            <TextField
-                                {...field}
-                                fullWidth
-                                label="Endereço completo"
-                                variant="outlined"
-                                placeholder="Rua, número, bairro, cidade"
-                                error={!!errors.endereco}
-                                helperText={errors.endereco?.message}
-                                margin="normal"
-                                InputProps={{
-                                    endAdornment: (
-                                        <InputAdornment position="end">
-                                            <IconButton
-                                                onClick={getCurrentLocation}
-                                                disabled={locating}
-                                                edge="end"
-                                                color="primary"
-                                                title="Usar minha localização atual"
-                                            >
-                                                {locating ? <CircularProgress size={24} /> : <MyLocationIcon />}
-                                            </IconButton>
-                                        </InputAdornment>
-                                    ),
+                            <Autocomplete
+                                freeSolo
+                                options={addressSuggestions}
+                                loading={loadingSuggestions}
+                                onInputChange={(_, newValue) => {
+                                    setInputValue(newValue);
                                 }}
+                                onChange={(_, newValue) => {
+                                    field.onChange(newValue || '');
+                                }}
+                                value={field.value || ''}
+                                renderInput={(params) => (
+                                    <TextField
+                                        {...params}
+                                        fullWidth
+                                        label="Endereço completo"
+                                        variant="outlined"
+                                        placeholder="Digite a rua, número, bairro, cidade..."
+                                        InputProps={{
+                                            ...params.InputProps,
+                                            endAdornment: (
+                                                <>
+                                                    {loadingSuggestions ? <CircularProgress color="inherit" size={20} /> : null}
+                                                    {params.InputProps.endAdornment}
+                                                </>
+                                            ),
+                                        }}
+                                    />
+                                )}
                             />
                         )}
                     />
                 </Grid>
 
-                <Grid size={{ xs: 12, md: 6 }}>
-                    <Controller
-                        name="latitude"
-                        control={control}
-                        render={({ field }) => (
-                            <TextField
-                                {...field}
-                                fullWidth
-                                label="Latitude"
-                                variant="outlined"
-                                margin="normal"
-                                InputProps={{
-                                    readOnly: true,
-                                }}
-                            />
-                        )}
-                    />
-                </Grid>
-
-                <Grid size={{ xs: 12, md: 6 }}>
-                    <Controller
-                        name="longitude"
-                        control={control}
-                        render={({ field }) => (
-                            <TextField
-                                {...field}
-                                fullWidth
-                                label="Longitude"
-                                variant="outlined"
-                                margin="normal"
-                                InputProps={{
-                                    readOnly: true,
-                                }}
-                            />
-                        )}
-                    />
-                </Grid>
-
-                {(locationError || geocodeError) && (
-                    <Grid size={{ xs: 12 }}>
-                        <Alert severity="error">{locationError || geocodeError}</Alert>
+                {locationError && (
+                    <Grid size={{ xs: 12 }} >
+                        <Alert severity="error">{locationError}</Alert>
                     </Grid>
                 )}
 
-                {watchedLat && watchedLng && (
-                    <Grid size={{ xs: 12 }}>
-                        <Alert severity="success">
-                            Localização definida com sucesso!
-                        </Alert>
-                    </Grid>
-                )}
-
-                <Grid size={{ xs: 12 }}>
-                    <Typography variant="body2" color="text.secondary">
-                        Para melhor precisão, informe o endereço completo ou use o botão de localização atual.
-                        Caso saiba as coordenadas exatas, pode informá-las diretamente.
-                    </Typography>
+                <Grid size={{ xs: 12 }} >
+                    <Button
+                        startIcon={<LocationOnIcon />}
+                        onClick={getCurrentLocation}
+                        variant="outlined"
+                        disabled={locating}
+                        sx={{ mr: 1 }}
+                    >
+                        {locating ? "Obtendo localização..." : "Usar minha localização atual"}
+                    </Button>
                 </Grid>
             </Grid>
 
             <Box sx={{
-                display: "flex",
-                flexDirection: { xs: 'column', sm: 'row' },
-                justifyContent: "space-between",
-                gap: 2,
-                mt: 4
+                mt: 4,
+                display: 'flex',
+                justifyContent: 'space-between'
             }}>
-                <Button
-                    onClick={onBack}
-                    variant="outlined"
-                    fullWidth={false}
-                    sx={{ width: { xs: '100%', sm: 'auto' } }}
-                >
+                <Button onClick={onBack} variant="outlined">
                     Voltar
                 </Button>
-                <Button
-                    type="submit"
-                    variant="contained"
-                    disabled={isLoading || locating}
-                    sx={{ width: { xs: '100%', sm: 'auto' } }}
-                >
-                    {isLoading ? <CircularProgress size={24} /> : "Próximo"}
+                <Button type="submit" variant="contained" color="primary">
+                    Próximo
                 </Button>
             </Box>
         </Box>
     );
-}
-
-// Função para converter coordenadas em endereço (implementação simplificada)
-async function reverseGeocode(lat: number, lng: number): Promise<string> {
-    // Esta seria uma implementação real usando uma API como Google Maps ou Nominatim
-    // Para este exemplo, vamos retornar um endereço fictício
-    return "Endereço obtido a partir da sua localização atual";
 }

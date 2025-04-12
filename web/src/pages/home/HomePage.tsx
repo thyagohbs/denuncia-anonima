@@ -10,6 +10,57 @@ import HeroCarousel from '../../components/home/HeroCarousel';
 export default function HomePage() {
     return (
         <>
+            <Box sx={{
+                backgroundColor: 'primary.main',
+                color: 'white',
+                py: { xs: 8, md: 12 },
+                textAlign: 'center'
+            }}>
+                <Container>
+                    <Typography
+                        variant="h2"
+                        component="h1"
+                        gutterBottom
+                        sx={{
+                            fontWeight: 'bold',
+                            fontSize: { xs: '2rem', sm: '3rem', md: '3.75rem' }
+                        }}
+                    >
+                        Canal de Denúncia Anônima
+                    </Typography>
+
+                    <Typography
+                        variant="h5"
+                        sx={{ mb: 4, maxWidth: '800px', mx: 'auto' }}
+                    >
+                        Nossa plataforma é totalmente anônima e segura. Denuncie casos
+                        de assédio, discriminação ou violência.
+                    </Typography>
+
+                    <Button
+                        component={RouterLink}
+                        to="/report"
+                        variant="contained"
+                        color="secondary"
+                        size="large"
+                        sx={{
+                            py: 1.5,
+                            px: 4,
+                            fontSize: '1.1rem',
+                            fontWeight: 'bold',
+                            backgroundColor: 'white',
+                            color: 'primary.main',
+                            '&:hover': {
+                                backgroundColor: 'grey.100',
+                            },
+                            width: { xs: '100%', sm: 'auto' }
+                        }}
+                    >
+                        Denuncie Agora
+                    </Button>
+                </Container>
+            </Box>
+
             {/* Hero Carousel */}
             <HeroCarousel />
 
