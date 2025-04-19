@@ -12,8 +12,13 @@ export enum ReportType {
 
 export interface Location {
   endereco?: string;
-  latitude: number;
-  longitude: number;
+  latitude?: number;
+  longitude?: number;
+  cidade?: string;
+  bairro?: string;
+  rua?: string;
+  numero?: string;
+  referencia?: string;
 }
 
 export interface ReportFormData {
