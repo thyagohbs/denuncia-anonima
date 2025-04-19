@@ -66,4 +66,43 @@ export const submitAnonymousReport = async (reportData: ReportData) => {
   }
 };
 
+interface LocationData {
+  endereco?: string;
+  latitude?: number;
+  longitude?: number;
+}
+
+interface DenunciaData {
+  tipo: string;
+  localizacao: LocationData;
+}
+
+interface DenunciaResponse {
+  protocolo: string;
+  status: string;
+  dataRegistro: string;
+}
+
+export const submitDenuncia = async (
+  data: DenunciaData
+): Promise<DenunciaResponse> => {
+  try {
+    const response = await api.post("/denuncias", data);
+    return response.data;
+  } catch (error) {
+    console.error("Erro ao enviar denúncia:", error);
+    throw error;
+  }
+};
+
+export const getDenuncia = async (protocolo: string) => {
+  try {
+    const response = await api.get(`/denuncias/${protocolo}`);
+    return response.data;
+  } catch (error) {
+    console.error("Erro ao buscar denúncia:", error);
+    throw error;
+  }
+};
+
 export default api;

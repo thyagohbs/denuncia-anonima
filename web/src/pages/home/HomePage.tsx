@@ -1,274 +1,122 @@
-import { Box, Button, Container, Grid, Paper, Typography } from '@mui/material';
-import { Link as RouterLink } from 'react-router-dom';
-import ReportIcon from '@mui/icons-material/Report';
-import SearchIcon from '@mui/icons-material/Search';
-import SecurityIcon from '@mui/icons-material/Security';
-import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-import EmojiPeopleIcon from '@mui/icons-material/EmojiPeople';
-import HeroCarousel from '../../components/home/HeroCarousel';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import {
+    Box, Container, Typography, Grid, Card, CardContent,
+    CardActionArea, Divider, AppBar, Toolbar, IconButton
+} from '@mui/material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+// Novos ícones mais apropriados
+import NoAccountsIcon from '@mui/icons-material/NoAccounts'; // Assédio sexual
+import SentimentVeryDissatisfiedIcon from '@mui/icons-material/SentimentVeryDissatisfied'; // Assédio moral
+import WomanIcon from '@mui/icons-material/Woman'; // Discriminação de gênero
+import RecordVoiceOverIcon from '@mui/icons-material/RecordVoiceOver'; // Violência verbal
+import GavelIcon from '@mui/icons-material/Gavel'; // Abuso de autoridade
+import { ReportType } from '../../store/useReportStore';
+import useReportStore from '../../store/useReportStore';
 
 export default function HomePage() {
+    const navigate = useNavigate();
+    const { updateFormData } = useReportStore();
+    const [selected, setSelected] = useState<string | null>(null);
+
+    const handleBackClick = () => {
+        navigate('/start');
+    };
+
+    const handleTypeSelect = (type: ReportType) => {
+        setSelected(type);
+        updateFormData({ tipo: type });
+
+        // Simular um breve atraso para feedback visual
+        setTimeout(() => {
+            navigate('/local');
+        }, 150);
+    };
+
+    const denunciaTypes = [
+        {
+            type: ReportType.ASSEDIO_SEXUAL,
+            label: 'Assédio Sexual',
+            description: 'Insinuações, toques não consentidos ou propostas de natureza sexual',
+            icon: <NoAccountsIcon sx={{ fontSize: 40 }} />
+        },
+        {
+            type: ReportType.ASSEDIO_MORAL,
+            label: 'Assédio Moral',
+            description: 'Humilhação, intimidação ou exclusão sistemática no ambiente de trabalho',
+            icon: <SentimentVeryDissatisfiedIcon sx={{ fontSize: 40 }} />
+        },
+        {
+            type: ReportType.DISCRIMINACAO_GENERO,
+            label: 'Discriminação de Gênero',
+            description: 'Tratamento diferenciado negativo baseado em gênero',
+            icon: <WomanIcon sx={{ fontSize: 40 }} />
+        },
+        {
+            type: ReportType.VIOLENCIA_VERBAL,
+            label: 'Violência Verbal',
+            description: 'Ameaças, xingamentos ou comunicação ofensiva',
+            icon: <RecordVoiceOverIcon sx={{ fontSize: 40 }} />
+        },
+        {
+            type: ReportType.ABUSO_AUTORIDADE,
+            label: 'Abuso de Autoridade',
+            description: 'Uso indevido de poder hierárquico ou funcional',
+            icon: <GavelIcon sx={{ fontSize: 40 }} />
+        }
+    ];
+
     return (
-        <>
-            <Box sx={{
-                backgroundColor: 'primary.main',
-                color: 'white',
-                py: { xs: 8, md: 12 },
-                textAlign: 'center'
-            }}>
-                <Container>
-                    <Typography
-                        variant="h2"
-                        component="h1"
-                        gutterBottom
-                        sx={{
-                            fontWeight: 'bold',
-                            fontSize: { xs: '2rem', sm: '3rem', md: '3.75rem' }
-                        }}
+        <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+            <AppBar position="static">
+                <Toolbar>
+                    <IconButton
+                        edge="start"
+                        color="inherit"
+                        onClick={handleBackClick}
+                        aria-label="voltar"
                     >
-                        Canal de Denúncia Anônima
+                        <ArrowBackIcon />
+                    </IconButton>
+                    <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+                        Denúncia Anônima
                     </Typography>
+                </Toolbar>
+            </AppBar>
 
-                    <Typography
-                        variant="h5"
-                        sx={{ mb: 4, maxWidth: '800px', mx: 'auto' }}
-                    >
-                        Nossa plataforma é totalmente anônima e segura. Denuncie casos
-                        de assédio, discriminação ou violência.
-                    </Typography>
+            <Container maxWidth="md" sx={{ py: 4, flexGrow: 1 }}>
+                <Typography variant="h5" component="h1" gutterBottom align="center">
+                    Selecione o tipo de denúncia
+                </Typography>
 
-                    <Button
-                        component={RouterLink}
-                        to="/report"
-                        variant="contained"
-                        color="secondary"
-                        size="large"
-                        sx={{
-                            py: 1.5,
-                            px: 4,
-                            fontSize: '1.1rem',
-                            fontWeight: 'bold',
-                            backgroundColor: 'white',
-                            color: 'primary.main',
-                            '&:hover': {
-                                backgroundColor: 'grey.100',
-                            },
-                            width: { xs: '100%', sm: 'auto' }
-                        }}
-                    >
-                        Denuncie Agora
-                    </Button>
-                </Container>
-            </Box>
+                <Divider sx={{ my: 3 }} />
 
-            {/* Hero Carousel */}
-            <HeroCarousel />
-
-            {/* CTA Section */}
-            <Box sx={{ py: { xs: 4, sm: 6 } }}>
-                <Container>
-                    <Grid container spacing={3} justifyContent="center">
-                        <Grid size={{ xs: 12, sm: 6 }}>
-                            <Button
-                                component={RouterLink}
-                                to="/report"
-                                startIcon={<ReportIcon />}
-                                variant="contained"
-                                fullWidth
-                                size="large"
+                <Grid container spacing={2}>
+                    {denunciaTypes.map((item) => (
+                        <Grid size={{ xs: 12 }} key={item.type}>
+                            <Card
+                                elevation={selected === item.type ? 3 : 1}
                                 sx={{
-                                    py: 1.5,
-                                    backgroundColor: 'primary.main',
-                                    '&:hover': {
-                                        backgroundColor: 'primary.dark',
-                                    }
+                                    borderLeft: selected === item.type ? '4px solid #1976d2' : 'none',
+                                    transition: 'all 0.2s ease'
                                 }}
                             >
-                                Fazer Denúncia
-                            </Button>
+                                <CardActionArea onClick={() => handleTypeSelect(item.type)}>
+                                    <CardContent sx={{ display: 'flex', alignItems: 'center', p: 2 }}>
+                                        <Box sx={{ color: 'primary.main', mr: 2 }}>{item.icon}</Box>
+                                        <Box>
+                                            <Typography variant="h6" component="h2">{item.label}</Typography>
+                                            <Typography variant="body2" color="text.secondary">
+                                                {item.description}
+                                            </Typography>
+                                        </Box>
+                                    </CardContent>
+                                </CardActionArea>
+                            </Card>
                         </Grid>
-                        <Grid size={{ xs: 12, sm: 6 }}>
-                            <Button
-                                component={RouterLink}
-                                to="/track"
-                                startIcon={<SearchIcon />}
-                                variant="outlined"
-                                fullWidth
-                                size="large"
-                                sx={{ py: 1.5 }}
-                            >
-                                Consultar Denúncia
-                            </Button>
-                        </Grid>
-                    </Grid>
-                </Container>
-            </Box>
-
-            {/* Feature Section */}
-            <Box sx={{ py: { xs: 4, sm: 6 } }}>
-                <Container sx={{ py: { xs: 2, sm: 4 } }}>
-                    <Typography
-                        variant="h4"
-                        component="h2"
-                        align="center"
-                        gutterBottom
-                        sx={{
-                            mb: 4,
-                            fontWeight: 'bold',
-                            fontSize: { xs: '1.75rem', sm: '2.25rem' }
-                        }}
-                    >
-                        Por que escolher nossa plataforma?
-                    </Typography>
-
-                    <Grid container spacing={{ xs: 3, md: 4 }}>
-                        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-                            <Paper
-                                elevation={2}
-                                sx={{
-                                    p: { xs: 3, sm: 4 },
-                                    height: '100%',
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    alignItems: 'center',
-                                    textAlign: 'center',
-                                    borderRadius: 4,
-                                }}
-                            >
-                                <SecurityIcon color="primary" sx={{ fontSize: { xs: 40, sm: 60 }, mb: 2 }} />
-                                <Typography
-                                    variant="h5"
-                                    component="h3"
-                                    gutterBottom
-                                    sx={{ fontSize: { xs: '1.25rem', sm: '1.5rem' } }}
-                                >
-                                    Segurança
-                                </Typography>
-                                <Typography variant="body1" color="text.secondary">
-                                    Suas informações são protegidas por criptografia avançada
-                                    e armazenadas de forma segura.
-                                </Typography>
-                            </Paper>
-                        </Grid>
-                        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-                            <Paper
-                                elevation={2}
-                                sx={{
-                                    p: { xs: 3, sm: 4 },
-                                    height: '100%',
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    alignItems: 'center',
-                                    textAlign: 'center',
-                                    borderRadius: 4,
-                                }}
-                            >
-                                <VisibilityOffIcon color="primary" sx={{ fontSize: { xs: 40, sm: 60 }, mb: 2 }} />
-                                <Typography
-                                    variant="h5"
-                                    component="h3"
-                                    gutterBottom
-                                    sx={{ fontSize: { xs: '1.25rem', sm: '1.5rem' } }}
-                                >
-                                    Anonimato
-                                </Typography>
-                                <Typography variant="body1" color="text.secondary">
-                                    Garantimos seu anonimato durante todo o processo.
-                                    Não coletamos dados pessoais ou de identificação.
-                                </Typography>
-                            </Paper>
-                        </Grid>
-                        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-                            <Paper
-                                elevation={2}
-                                sx={{
-                                    p: { xs: 3, sm: 4 },
-                                    height: '100%',
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    alignItems: 'center',
-                                    textAlign: 'center',
-                                    borderRadius: 4,
-                                }}
-                            >
-                                <EmojiPeopleIcon color="primary" sx={{ fontSize: { xs: 40, sm: 60 }, mb: 2 }} />
-                                <Typography
-                                    variant="h5"
-                                    component="h3"
-                                    gutterBottom
-                                    sx={{ fontSize: { xs: '1.25rem', sm: '1.5rem' } }}
-                                >
-                                    Facilidade
-                                </Typography>
-                                <Typography variant="body1" color="text.secondary">
-                                    Interface simples e intuitiva para realizar denúncias
-                                    em poucos passos, sem burocracia.
-                                </Typography>
-                            </Paper>
-                        </Grid>
-                    </Grid>
-                </Container>
-            </Box>
-
-            {/* CTA Section */}
-            <Box
-                sx={{
-                    bgcolor: 'primary.main',
-                    color: 'primary.contrastText',
-                    py: { xs: 4, sm: 6 },
-                    borderRadius: { xs: 2, sm: 4 },
-                    mx: { xs: 2, sm: 4 },
-                    my: { xs: 3, sm: 5 },
-                    textAlign: 'center'
-                }}
-            >
-                <Container>
-                    <Typography
-                        variant="h4"
-                        component="h2"
-                        gutterBottom
-                        sx={{
-                            fontWeight: 'bold',
-                            mb: 3,
-                            fontSize: { xs: '1.75rem', sm: '2.25rem' }
-                        }}
-                    >
-                        Pronta para fazer uma denúncia?
-                    </Typography>
-
-                    <Typography
-                        variant="body1"
-                        paragraph
-                        sx={{ mb: 4, maxWidth: 'md', mx: 'auto' }}
-                    >
-                        Nossa plataforma é totalmente anônima e segura. Denuncie casos
-                        de assédio, discriminação ou violência e ajude a construir um ambiente
-                        mais seguro para todas.
-                    </Typography>
-
-                    <Button
-                        component={RouterLink}
-                        to="/report"
-                        variant="contained"
-                        color="secondary"
-                        size="large"
-                        sx={{
-                            py: 1.5,
-                            px: 4,
-                            fontSize: '1.1rem',
-                            fontWeight: 'bold',
-                            backgroundColor: 'white',
-                            color: 'primary.main',
-                            '&:hover': {
-                                backgroundColor: 'grey.100',
-                            },
-                            width: { xs: '100%', sm: 'auto' }
-                        }}
-                    >
-                        Denuncie Agora
-                    </Button>
-                </Container>
-            </Box>
-        </>
+                    ))}
+                </Grid>
+            </Container>
+        </Box>
     );
 }

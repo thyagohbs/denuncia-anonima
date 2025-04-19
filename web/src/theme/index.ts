@@ -1,17 +1,17 @@
 import { createTheme, responsiveFontSizes } from "@mui/material/styles";
 
-// Definindo as cores principais
+// Definindo as cores principais baseadas no disque-denuncia
 const colors = {
   primary: {
-    main: "#1976d2",
-    light: "#42a5f5",
-    dark: "#1565c0",
+    main: "#1565c0", // Azul mais escuro como no site original
+    light: "#5e92f3",
+    dark: "#003c8f",
     contrastText: "#fff",
   },
   secondary: {
-    main: "#9c27b0",
-    light: "#ba68c8",
-    dark: "#7b1fa2",
+    main: "#ff5722", // Cor de destaque para botões secundários
+    light: "#ff8a50",
+    dark: "#c41c00",
     contrastText: "#fff",
   },
   error: {
@@ -20,9 +20,9 @@ const colors = {
     dark: "#c62828",
   },
   warning: {
-    main: "#ed6c02",
-    light: "#ff9800",
-    dark: "#e65100",
+    main: "#ffa000",
+    light: "#ffb74d",
+    dark: "#f57f17",
   },
   info: {
     main: "#0288d1",
@@ -30,7 +30,7 @@ const colors = {
     dark: "#01579b",
   },
   success: {
-    main: "#2e7d32",
+    main: "#388e3c",
     light: "#4caf50",
     dark: "#1b5e20",
   },
@@ -53,6 +53,9 @@ let theme = createTheme({
     success: {
       main: colors.success.main,
     },
+    background: {
+      default: "#f5f5f5",
+    },
   },
   typography: {
     fontFamily: [
@@ -60,12 +63,8 @@ let theme = createTheme({
       "-apple-system",
       "BlinkMacSystemFont",
       '"Segoe UI"',
-      '"Helvetica Neue"',
       "Arial",
       "sans-serif",
-      '"Apple Color Emoji"',
-      '"Segoe UI Emoji"',
-      '"Segoe UI Symbol"',
     ].join(","),
     h1: {
       fontWeight: 700,
@@ -85,13 +84,18 @@ let theme = createTheme({
     h6: {
       fontWeight: 500,
     },
+    button: {
+      textTransform: "none", // Como no site original
+      fontWeight: 500,
+    },
   },
   components: {
     MuiButton: {
       styleOverrides: {
         root: {
-          borderRadius: 8,
-          textTransform: "none",
+          borderRadius: 4, // Botões mais quadrados como no site original
+          boxShadow: "none", // Menos sombra
+          textTransform: "none", // Sem caps
           fontWeight: 500,
           // Garantir tamanho mínimo recomendado para touch targets
           minHeight: "48px",
@@ -104,6 +108,12 @@ let theme = createTheme({
           padding: "12px 22px", // Aumenta area de toque
           "@media (max-width: 600px)": {
             padding: "12px 16px",
+          },
+        },
+        contained: {
+          boxShadow: "0 1px 3px rgba(0,0,0,0.12)", // Sombra sutil
+          "&:hover": {
+            boxShadow: "0 2px 5px rgba(0,0,0,0.2)",
           },
         },
       },
@@ -119,7 +129,7 @@ let theme = createTheme({
     MuiPaper: {
       styleOverrides: {
         rounded: {
-          borderRadius: 12,
+          borderRadius: 4, // Cantos menos arredondados como no site original
           "@media (max-width: 600px)": {
             borderRadius: 8,
           },
@@ -129,8 +139,11 @@ let theme = createTheme({
     MuiCard: {
       styleOverrides: {
         root: {
-          borderRadius: 12,
-          boxShadow: "0 8px 16px 0 rgba(0,0,0,0.1)",
+          borderRadius: 4,
+          boxShadow: "0 1px 3px rgba(0,0,0,0.12)",
+          "&:hover": {
+            boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
+          },
           "@media (max-width: 600px)": {
             boxShadow: "0 4px 8px 0 rgba(0,0,0,0.1)",
           },
@@ -140,7 +153,8 @@ let theme = createTheme({
     MuiAppBar: {
       styleOverrides: {
         root: {
-          boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+          backgroundColor: colors.primary.main,
+          boxShadow: "0 1px 4px rgba(0,0,0,0.1)", // Sombra sutil
         },
       },
     },

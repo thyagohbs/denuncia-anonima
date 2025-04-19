@@ -1,62 +1,49 @@
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom';
-import MainLayout from '../layouts/MainLayout';
+import StartPage from '../pages/StartPage';
 import HomePage from '../pages/home/HomePage';
-import ReportFormPage from '../pages/report/ReportFormPage';
-import ReportLocationPage from '../pages/report/ReportLocationPage';
-import ReportDetailsPage from '../pages/report/ReportDetailsPage';
-import ReportConfirmationPage from '../pages/report/ReportConfirmationPage';
-import TrackReportPage from '../pages/track/TrackReportPage';
+import LocationPage from '../pages/location/LocationPage';
+import ConfirmationPage from '../pages/confirmation/ConfirmationPage';
+import SuccessPage from '../pages/success/SuccessPage';
 import NotFoundPage from '../pages/NotFoundPage';
+import TrackerPage from '../pages/tracker/TrackerPage';
 
 const router = createBrowserRouter([
     {
         path: '/',
-        element: <MainLayout />,
         children: [
-            // Página inicial
             {
                 index: true,
+                element: <Navigate to="/start" replace />
+            },
+            {
+                path: 'start',
+                element: <StartPage />
+            },
+            {
+                path: 'home',
                 element: <HomePage />
             },
-            // Fluxo de denúncia (rotas aninhadas)
             {
-                path: 'report',
-                children: [
-                    {
-                        index: true,
-                        element: <ReportFormPage /> // Página inicial do formulário
-                    },
-                    {
-                        path: 'location',
-                        element: <ReportLocationPage /> // Página para selecionar localização
-                    },
-                    {
-                        path: 'details',
-                        element: <ReportDetailsPage /> // Página para detalhes adicionais
-                    },
-                    {
-                        path: 'confirmation',
-                        element: <ReportConfirmationPage /> // Confirmação final
-                    }
-                ]
+                path: 'local',
+                element: <LocationPage />
             },
-            // Consultar denúncia pelo protocolo
+            {
+                path: 'confirmation',
+                element: <ConfirmationPage />
+            },
+            {
+                path: 'success',
+                element: <SuccessPage />
+            },
             {
                 path: 'track',
-                element: <TrackReportPage />
+                element: <TrackerPage />
             },
-
-            // Página não encontrada
             {
                 path: '*',
                 element: <NotFoundPage />
             }
         ]
-    },
-    // Rotas do painel administrativo (redirecionará para o dashboard)
-    {
-        path: 'admin/*',
-        element: <Navigate to="/admin" replace />
     }
 ]);
 
