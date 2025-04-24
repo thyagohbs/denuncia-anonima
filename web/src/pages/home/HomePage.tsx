@@ -1,122 +1,107 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-    Box, Container, Typography, Grid, Card, CardContent,
-    CardActionArea, Divider, AppBar, Toolbar, IconButton
-} from '@mui/material';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-// Novos ícones mais apropriados
-import NoAccountsIcon from '@mui/icons-material/NoAccounts'; // Assédio sexual
-import SentimentVeryDissatisfiedIcon from '@mui/icons-material/SentimentVeryDissatisfied'; // Assédio moral
-import WomanIcon from '@mui/icons-material/Woman'; // Discriminação de gênero
-import RecordVoiceOverIcon from '@mui/icons-material/RecordVoiceOver'; // Violência verbal
-import GavelIcon from '@mui/icons-material/Gavel'; // Abuso de autoridade
-import { ReportType } from '../../store/useReportStore';
-import useReportStore from '../../store/useReportStore';
+import { Container, Row, Col, Card, Button } from 'react-bootstrap';
+import { FaBan, FaSadTear, FaFemale, FaMicrophone, FaGavel, FaArrowLeft } from 'react-icons/fa';
+import useReportStore, { ReportType } from '../../store/useReportStore';
 
 export default function HomePage() {
-    const navigate = useNavigate();
-    const { updateFormData } = useReportStore();
     const [selected, setSelected] = useState<string | null>(null);
+    const navigate = useNavigate();
+    const { setReportType } = useReportStore();
+
+    const handleTypeSelect = (type: string) => {
+        setSelected(type);
+        setReportType(type as ReportType);
+        setTimeout(() => navigate("/local"), 300);
+    };
 
     const handleBackClick = () => {
-        navigate('/start');
+        navigate(-1);
     };
 
-    const handleTypeSelect = (type: ReportType) => {
-        setSelected(type);
-        updateFormData({ tipo: type });
-
-        // Simular um breve atraso para feedback visual
-        setTimeout(() => {
-            navigate('/local');
-        }, 150);
-    };
-
+    // Tipos de denúncia
     const denunciaTypes = [
         {
-            type: ReportType.ASSEDIO_SEXUAL,
-            label: 'Assédio Sexual',
-            description: 'Insinuações, toques não consentidos ou propostas de natureza sexual',
-            icon: <NoAccountsIcon sx={{ fontSize: 40 }} />
+            type: 'VIOLENCIA_FISICA',
+            label: 'Violência Física',
+            description: 'Agressões físicas, ameaças, intimidação',
+            icon: <FaSadTear size={32} />
         },
         {
-            type: ReportType.ASSEDIO_MORAL,
-            label: 'Assédio Moral',
-            description: 'Humilhação, intimidação ou exclusão sistemática no ambiente de trabalho',
-            icon: <SentimentVeryDissatisfiedIcon sx={{ fontSize: 40 }} />
+            type: 'VIOLENCIA_SEXUAL',
+            label: 'Violência Sexual',
+            description: 'Assédio, importunação ou abuso sexual',
+            icon: <FaFemale size={32} />
         },
         {
-            type: ReportType.DISCRIMINACAO_GENERO,
-            label: 'Discriminação de Gênero',
-            description: 'Tratamento diferenciado negativo baseado em gênero',
-            icon: <WomanIcon sx={{ fontSize: 40 }} />
+            type: 'AMEACA',
+            label: 'Ameaça',
+            description: 'Intimidação, coação ou difamação',
+            icon: <FaMicrophone size={32} />
         },
         {
-            type: ReportType.VIOLENCIA_VERBAL,
-            label: 'Violência Verbal',
-            description: 'Ameaças, xingamentos ou comunicação ofensiva',
-            icon: <RecordVoiceOverIcon sx={{ fontSize: 40 }} />
+            type: 'INTOLERANCIA',
+            label: 'Intolerância',
+            description: 'Discriminação racial, religiosa, sexual ou social',
+            icon: <FaBan size={32} />
         },
         {
-            type: ReportType.ABUSO_AUTORIDADE,
+            type: 'ABUSO_AUTORIDADE',
             label: 'Abuso de Autoridade',
             description: 'Uso indevido de poder hierárquico ou funcional',
-            icon: <GavelIcon sx={{ fontSize: 40 }} />
+            icon: <FaGavel size={32} />
         }
     ];
 
     return (
-        <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-            <AppBar position="static">
-                <Toolbar>
-                    <IconButton
-                        edge="start"
-                        color="inherit"
+        <div className="d-flex flex-column min-vh-100">
+            <header className="bg-primary text-white">
+                <div className="d-flex align-items-center py-2 px-3">
+                    <Button
+                        variant="link"
+                        className="text-white p-1"
                         onClick={handleBackClick}
                         aria-label="voltar"
                     >
-                        <ArrowBackIcon />
-                    </IconButton>
-                    <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+                        <FaArrowLeft />
+                    </Button>
+                    <h1 className="h5 mb-0 ms-2 flex-grow-1">
                         Denúncia Anônima
-                    </Typography>
-                </Toolbar>
-            </AppBar>
+                    </h1>
+                </div>
+            </header>
 
-            <Container maxWidth="md" sx={{ py: 4, flexGrow: 1 }}>
-                <Typography variant="h5" component="h1" gutterBottom align="center">
+            <Container className="py-4 flex-grow-1">
+                <h2 className="text-center mb-4">
                     Selecione o tipo de denúncia
-                </Typography>
+                </h2>
 
-                <Divider sx={{ my: 3 }} />
+                <hr className="my-4" />
 
-                <Grid container spacing={2}>
+                <Row xs={1} md={2} className="g-4">
                     {denunciaTypes.map((item) => (
-                        <Grid size={{ xs: 12 }} key={item.type}>
+                        <Col key={item.type}>
                             <Card
-                                elevation={selected === item.type ? 3 : 1}
-                                sx={{
-                                    borderLeft: selected === item.type ? '4px solid #1976d2' : 'none',
-                                    transition: 'all 0.2s ease'
-                                }}
+                                onClick={() => handleTypeSelect(item.type)}
+                                className={`h-100 cursor-pointer transition-all ${selected === item.type ? 'border-primary border-2' : ''}`}
+                                style={{ cursor: 'pointer', transition: 'all 0.2s' }}
                             >
-                                <CardActionArea onClick={() => handleTypeSelect(item.type)}>
-                                    <CardContent sx={{ display: 'flex', alignItems: 'center', p: 2 }}>
-                                        <Box sx={{ color: 'primary.main', mr: 2 }}>{item.icon}</Box>
-                                        <Box>
-                                            <Typography variant="h6" component="h2">{item.label}</Typography>
-                                            <Typography variant="body2" color="text.secondary">
-                                                {item.description}
-                                            </Typography>
-                                        </Box>
-                                    </CardContent>
-                                </CardActionArea>
+                                <Card.Header className="pb-0">
+                                    <div className="d-flex align-items-center">
+                                        <div className="me-3 text-primary">
+                                            {item.icon}
+                                        </div>
+                                        <h3 className="h5 mb-0">{item.label}</h3>
+                                    </div>
+                                </Card.Header>
+                                <Card.Body className="pt-2">
+                                    <Card.Text>{item.description}</Card.Text>
+                                </Card.Body>
                             </Card>
-                        </Grid>
+                        </Col>
                     ))}
-                </Grid>
+                </Row>
             </Container>
-        </Box>
+        </div>
     );
 }

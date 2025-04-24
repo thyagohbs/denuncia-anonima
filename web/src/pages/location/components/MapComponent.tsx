@@ -1,130 +1,91 @@
-import { useEffect, useRef } from 'react';
-import { Box } from '@mui/material';
-import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
+import React, { useEffect, useRef } from "react";
+import "leaflet/dist/leaflet.css";
+import L from "leaflet";
 
-// Corrigir os ícones do Leaflet
-import icon from 'leaflet/dist/images/marker-icon.png';
-import iconShadow from 'leaflet/dist/images/marker-shadow.png';
-
-const DefaultIcon = L.icon({
-    iconUrl: icon,
-    shadowUrl: iconShadow,
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
+// Certifique-se de que as imagens do marcador estão disponíveis
+const icon = L.icon({
+  iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
+  shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41]
 });
 
-L.Marker.prototype.options.icon = DefaultIcon;
-
 interface MapComponentProps {
-    latitude?: number;
-    longitude?: number;
-    onSelectLocation: (lat: number, lng: number) => void;
+  center?: [number, number];
+  zoom?: number;
+  onClick?: (lat: number, lng: number) => void;
+  markerPosition?: [number, number] | null;
+  style?: React.CSSProperties;
 }
 
 export default function MapComponent({
-    latitude,
-    longitude,
-    onSelectLocation
+  center = [-9.6498, -35.7089], // Maceió, AL como padrão
+  zoom = 13,
+  onClick,
+  markerPosition = null,
+  style = {}
 }: MapComponentProps) {
-    const mapRef = useRef<HTMLDivElement>(null);
-    const mapInstance = useRef<L.Map | null>(null);
-    const markerRef = useRef<L.Marker | null>(null);
+  const mapRef = useRef<HTMLDivElement>(null);
+  const mapInstanceRef = useRef<L.Map | null>(null);
+  const markerRef = useRef<L.Marker | null>(null);
 
-    // Centro padrão (Brasil)
-    const defaultCenter: [number, number] = [-14.235, -51.9253];
-    const initialZoom = latitude && longitude ? 15 : 5;
+  useEffect(() => {
+    if (mapRef.current && !mapInstanceRef.current) {
+      // Inicializar o mapa
+      const mapInstance = L.map(mapRef.current).setView(center, zoom);
 
-    useEffect(() => {
-        if (!mapRef.current) return;
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+      }).addTo(mapInstance);
 
-        // Inicializar o mapa
-        if (!mapInstance.current) {
-            const map = L.map(mapRef.current).setView(
-                latitude && longitude ? [latitude, longitude] : defaultCenter,
-                initialZoom
-            );
+      // Adicionar evento de clique se onClick for fornecido
+      if (onClick) {
+        mapInstance.on('click', (e: L.LeafletMouseEvent) => {
+          const { lat, lng } = e.latlng;
+          onClick(lat, lng);
+        });
+      }
 
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            }).addTo(map);
+      mapInstanceRef.current = mapInstance;
+    }
 
-            // Adicionar marcador se houver coordenadas
-            if (latitude && longitude) {
-                markerRef.current = L.marker([latitude, longitude], { draggable: true })
-                    .addTo(map)
-                    .on('dragend', () => {
-                        // Arrow function não tem seu próprio 'this'
-                        if (markerRef.current) {
-                            const position = markerRef.current.getLatLng();
-                            onSelectLocation(position.lat, position.lng);
-                        }
-                    });
-            }
+    return () => {
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
+      }
+    };
+  }, []);
 
-            // Evento de clique no mapa para adicionar/mover o marcador
-            map.on('click', (event) => {
-                const { lat, lng } = event.latlng;
+  // Atualizar a posição do marcador quando markerPosition mudar
+  useEffect(() => {
+    if (mapInstanceRef.current) {
+      // Remover marcador existente
+      if (markerRef.current) {
+        markerRef.current.remove();
+        markerRef.current = null;
+      }
 
-                if (markerRef.current) {
-                    markerRef.current.setLatLng([lat, lng]);
-                } else {
-                    markerRef.current = L.marker([lat, lng], { draggable: true })
-                        .addTo(map)
-                        .on('dragend', () => {
-                            // Arrow function não tem seu próprio 'this'
-                            if (markerRef.current) {
-                                const position = markerRef.current.getLatLng();
-                                onSelectLocation(position.lat, position.lng);
-                            }
-                        });
-                }
+      // Adicionar novo marcador se posição for fornecida
+      if (markerPosition) {
+        markerRef.current = L.marker(markerPosition, { icon })
+          .addTo(mapInstanceRef.current);
 
-                onSelectLocation(lat, lng);
-            });
+        // Centraliza o mapa na posição do marcador
+        mapInstanceRef.current.setView(markerPosition, mapInstanceRef.current.getZoom());
+      }
+    }
+  }, [markerPosition]);
 
-            mapInstance.current = map;
-        }
-
-        return () => {
-            if (mapInstance.current) {
-                mapInstance.current.remove();
-                mapInstance.current = null;
-                markerRef.current = null;
-            }
-        };
-    }, []);
-
-    // Atualizar o mapa quando as coordenadas mudarem
-    useEffect(() => {
-        if (mapInstance.current && latitude !== undefined && longitude !== undefined) {
-            mapInstance.current.setView([latitude, longitude], 15);
-
-            if (markerRef.current) {
-                markerRef.current.setLatLng([latitude, longitude]);
-            } else {
-                markerRef.current = L.marker([latitude, longitude], { draggable: true })
-                    .addTo(mapInstance.current)
-                    .on('dragend', () => {
-                        // Arrow function não tem seu próprio 'this'
-                        if (markerRef.current) {
-                            const position = markerRef.current.getLatLng();
-                            onSelectLocation(position.lat, position.lng);
-                        }
-                    });
-            }
-        }
-    }, [latitude, longitude, onSelectLocation]);
-
-    return (
-        <Box
-            ref={mapRef}
-            sx={{
-                height: '350px',
-                width: '100%',
-                borderRadius: 1,
-                border: '1px solid #ccc'
-            }}
-        />
-    );
+  return (
+    <div
+      ref={mapRef}
+      style={{
+        height: '400px',
+        width: '100%',
+        borderRadius: '4px',
+        ...style
+      }}
+    />
+  );
 }

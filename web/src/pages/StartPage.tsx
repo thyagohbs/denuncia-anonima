@@ -1,66 +1,47 @@
-import { useNavigate } from 'react-router-dom';
-import { Box, Button, Container, Typography } from '@mui/material';
-import LogoAlagoas from '../components/common/LogoAlagoas';
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import { Container, Row, Col, Button } from 'react-bootstrap';
+import LogoAlagoas from "../components/common/LogoAlagoas";
 
 export default function StartPage() {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
-    const handleStart = () => {
-        navigate('/home');
-    };
+  const handleStart = () => {
+    navigate("/home");
+  };
 
-    return (
-        <Box
-            sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                minHeight: '100vh',
-                backgroundColor: '#f5f5f5',
-                padding: 2
-            }}
-        >
-            <Container maxWidth="sm">
-                <Box
-                    sx={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        backgroundColor: 'white',
-                        borderRadius: 1,
-                        padding: { xs: 3, sm: 5 },
-                        boxShadow: '0px 2px 10px rgba(0, 0, 0, 0.1)'
-                    }}
-                >
-                    <LogoAlagoas sx={{ width: '100%', maxWidth: 200, mb: 4 }} />
+  return (
+    <div
+      className="d-flex flex-column align-items-center justify-content-center min-vh-100"
+      style={{ backgroundColor: "#f8f9fa" }}
+    >
+      <Container className="py-5 text-center">
+        <Row className="justify-content-center">
+          <Col md={8} lg={6}>
+            <div className="mb-4">
+              <LogoAlagoas />
+            </div>
 
-                    <Typography variant="h5" component="h1" align="center" gutterBottom fontWeight="bold">
-                        Disque Denúncia Anônima
-                    </Typography>
+            <h1 className="display-5 fw-bold mb-4">
+              Denúncia Anônima
+            </h1>
 
-                    <Typography variant="body1" align="center" paragraph sx={{ mb: 4 }}>
-                        Canal seguro para relatar situações de assédio, discriminação
-                        e violência para mulheres da segurança pública.
-                    </Typography>
+            <p className="lead mb-5">
+              Faça sua denúncia de forma segura e anônima.
+              Sua identidade será preservada durante todo o processo.
+            </p>
 
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        size="large"
-                        fullWidth
-                        onClick={handleStart}
-                        sx={{
-                            py: 1.5,
-                            fontSize: '1.1rem',
-                            textTransform: 'none',
-                            borderRadius: 1
-                        }}
-                    >
-                        Iniciar Denúncia
-                    </Button>
-                </Box>
-            </Container>
-        </Box>
-    );
+            <Button
+              variant="primary"
+              size="lg"
+              onClick={handleStart}
+              className="py-3 w-100 fs-5"
+            >
+              Iniciar Denúncia
+            </Button>
+          </Col>
+        </Row>
+      </Container>
+    </div>
+  );
 }

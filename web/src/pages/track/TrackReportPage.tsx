@@ -2,17 +2,16 @@ import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import {
     Container,
-    Typography,
-    Box,
+    Row,
+    Col,
     Button,
-    Paper,
-    TextField,
-    CircularProgress,
+    Card,
+    Form,
+    Spinner,
     Alert,
-    Divider,
-    Chip
-} from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
+    Badge
+} from 'react-bootstrap';
+import { FaSearch } from 'react-icons/fa';
 import api from '../../services/api';
 import axios from 'axios';
 
@@ -36,12 +35,12 @@ const statusLabels: Record<string, string> = {
 };
 
 // Mapeamento de cores para os status
-const statusColors: Record<string, 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning'> = {
+const statusVariants: Record<string, string> = {
     'recebida': 'info',
     'em_analise': 'primary',
     'em_investigacao': 'warning',
     'concluida': 'success',
-    'arquivada': 'default'
+    'arquivada': 'secondary'
 };
 
 export default function TrackReportPage() {
@@ -102,102 +101,115 @@ export default function TrackReportPage() {
     };
 
     return (
-        <Container maxWidth="md">
-            <Box sx={{ my: 4 }}>
-                <Typography variant="h4" component="h1" gutterBottom align="center" fontWeight="bold">
-                    Consultar Denúncia
-                </Typography>
+        <Container className="my-5">
+            <Row className="justify-content-center">
+                <Col md={10} lg={8}>
+                    <h1 className="text-center fw-bold mb-3">Consultar Denúncia</h1>
 
-                <Typography variant="body1" paragraph align="center">
-                    Verifique o status da sua denúncia utilizando o número de protocolo recebido.
-                </Typography>
+                    <p className="text-center mb-4">
+                        Verifique o status da sua denúncia utilizando o número de protocolo recebido.
+                    </p>
 
-                <Paper elevation={2} sx={{ p: { xs: 2, sm: 4 }, borderRadius: 2, mb: 4 }}>
-                    <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
-                        <TextField
-                            fullWidth
-                            id="protocol"
-                            label="Número de Protocolo"
-                            variant="outlined"
-                            value={protocolId}
-                            onChange={(e) => setProtocolId(e.target.value)}
-                            placeholder="Digite o número de protocolo recebido"
-                        />
-                        <Button
-                            variant="contained"
-                            color="primary"
-                            onClick={() => handleSearch()}
-                            disabled={loading}
-                            startIcon={loading ? <CircularProgress size={20} color="inherit" /> : <SearchIcon />}
-                            sx={{ height: 56 }}
-                        >
-                            Buscar
-                        </Button>
-                    </Box>
+                    <Card className="shadow-sm mb-4">
+                        <Card.Body className="p-4">
+                            <Row className="align-items-start g-2">
+                                <Col>
+                                    <Form.Group>
+                                        <Form.Control
+                                            id="protocol"
+                                            placeholder="Digite o número de protocolo recebido"
+                                            value={protocolId}
+                                            onChange={(e) => setProtocolId(e.target.value)}
+                                            aria-label="Número de Protocolo"
+                                        />
+                                        <Form.Label htmlFor="protocol">Número de Protocolo</Form.Label>
+                                    </Form.Group>
+                                </Col>
+                                <Col xs="auto">
+                                    <Button
+                                        variant="primary"
+                                        onClick={() => handleSearch()}
+                                        disabled={loading}
+                                        style={{ height: '38px' }}
+                                    >
+                                        {loading ? (
+                                            <Spinner size="sm" animation="border" role="status" className="me-1">
+                                                <span className="visually-hidden">Carregando...</span>
+                                            </Spinner>
+                                        ) : (
+                                            <FaSearch className="me-1" />
+                                        )}
+                                        Buscar
+                                    </Button>
+                                </Col>
+                            </Row>
 
-                    {error && (
-                        <Alert severity="error" sx={{ mt: 3 }}>
-                            {error}
-                        </Alert>
+                            {error && (
+                                <Alert variant="danger" className="mt-3 mb-0">
+                                    {error}
+                                </Alert>
+                            )}
+                        </Card.Body>
+                    </Card>
+
+                    {loading && (
+                        <div className="text-center my-4">
+                            <Spinner animation="border" role="status">
+                                <span className="visually-hidden">Carregando...</span>
+                            </Spinner>
+                        </div>
                     )}
-                </Paper>
 
-                {loading && (
-                    <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-                        <CircularProgress />
-                    </Box>
-                )}
+                    {report && (
+                        <Card className="shadow-sm">
+                            <Card.Body className="p-4">
+                                <div className="d-flex justify-content-between align-items-center mb-3">
+                                    <h2 className="h5 mb-0">
+                                        Protocolo: {report.protocolo}
+                                    </h2>
+                                    <Badge
+                                        bg={statusVariants[report.status] || "secondary"}
+                                        pill
+                                        className="px-3 py-2"
+                                    >
+                                        {statusLabels[report.status] || report.status}
+                                    </Badge>
+                                </div>
 
-                {report && (
-                    <Paper elevation={2} sx={{ p: { xs: 2, sm: 4 }, borderRadius: 2 }}>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                            <Typography variant="h5" component="h2">
-                                Protocolo: {report.protocolo}
-                            </Typography>
-                            <Chip
-                                label={statusLabels[report.status] || report.status}
-                                color={statusColors[report.status] || 'default'}
-                            />
-                        </Box>
+                                <hr className="my-3" />
 
-                        <Divider sx={{ mb: 3 }} />
+                                <div className="mb-3">
+                                    <p className="text-muted mb-1 small">Tipo de Denúncia</p>
+                                    <p className="mb-0">
+                                        {report.tipo.charAt(0).toUpperCase() + report.tipo.slice(1).replace('_', ' ')}
+                                    </p>
+                                </div>
 
-                        <Box sx={{ mb: 2 }}>
-                            <Typography variant="subtitle2" color="text.secondary">
-                                Tipo de Denúncia
-                            </Typography>
-                            <Typography variant="body1">
-                                {report.tipo.charAt(0).toUpperCase() + report.tipo.slice(1).replace('_', ' ')}
-                            </Typography>
-                        </Box>
+                                <div className="mb-3">
+                                    <p className="text-muted mb-1 small">Data de Registro</p>
+                                    <p className="mb-0">
+                                        {formatDate(report.criadoEm)}
+                                    </p>
+                                </div>
 
-                        <Box sx={{ mb: 2 }}>
-                            <Typography variant="subtitle2" color="text.secondary">
-                                Data de Registro
-                            </Typography>
-                            <Typography variant="body1">
-                                {formatDate(report.criadoEm)}
-                            </Typography>
-                        </Box>
+                                <div className="mb-3">
+                                    <p className="text-muted mb-1 small">Última Atualização</p>
+                                    <p className="mb-0">
+                                        {formatDate(report.atualizadoEm)}
+                                    </p>
+                                </div>
 
-                        <Box sx={{ mb: 2 }}>
-                            <Typography variant="subtitle2" color="text.secondary">
-                                Última Atualização
-                            </Typography>
-                            <Typography variant="body1">
-                                {formatDate(report.atualizadoEm)}
-                            </Typography>
-                        </Box>
-
-                        <Alert severity="info" sx={{ mt: 3 }}>
-                            <Typography variant="body2">
-                                Acompanhe regularmente o status da sua denúncia utilizando o número de protocolo fornecido.
-                                As atualizações serão refletidas nesta página.
-                            </Typography>
-                        </Alert>
-                    </Paper>
-                )}
-            </Box>
+                                <Alert variant="info" className="mt-4 mb-0">
+                                    <p className="mb-0 small">
+                                        Acompanhe regularmente o status da sua denúncia utilizando o número de protocolo fornecido.
+                                        As atualizações serão refletidas nesta página.
+                                    </p>
+                                </Alert>
+                            </Card.Body>
+                        </Card>
+                    )}
+                </Col>
+            </Row>
         </Container>
     );
 }

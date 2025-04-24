@@ -1,15 +1,10 @@
 import { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import {
-    Box, Container, Typography, Button,
-    Paper, Alert, Divider
-} from '@mui/material';
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
-import HomeIcon from '@mui/icons-material/Home';
-import SearchIcon from '@mui/icons-material/Search';
+import { Container, Card, Button, Row, Col } from 'react-bootstrap';
+import { FaCheckCircle } from 'react-icons/fa';
 
 interface LocationState {
-    protocol: string;
+    protocol?: string;
 }
 
 export default function SuccessPage() {
@@ -37,81 +32,68 @@ export default function SuccessPage() {
     };
 
     return (
-        <Box
-            sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                minHeight: '100vh',
-                backgroundColor: '#f5f5f5',
-                justifyContent: 'center',
-                py: 4
-            }}
+        <div
+            className="d-flex flex-column justify-content-center min-vh-100"
+            style={{ backgroundColor: "#f8f9fa", padding: "1rem 0" }}
         >
-            <Container maxWidth="md">
-                <Paper elevation={2} sx={{ p: 4, borderRadius: 1, textAlign: 'center' }}>
-                    <CheckCircleOutlineIcon
-                        color="success"
-                        sx={{ fontSize: 80, mb: 2 }}
-                    />
+            <Container className="py-4 py-md-5" style={{ maxWidth: "800px" }}>
+                <Card className="shadow-sm rounded text-center p-3 p-md-5">
+                    <Card.Body>
+                        <div className="d-flex justify-content-center mb-4">
+                            <FaCheckCircle
+                                className="text-success"
+                                size={window.innerWidth < 768 ? 64 : 96}
+                            />
+                        </div>
 
-                    <Typography variant="h5" component="h1" gutterBottom>
-                        Denúncia registrada com sucesso!
-                    </Typography>
+                        <h1 className="fw-bold mb-2 text-success h2">
+                            Denúncia Registrada com Sucesso
+                        </h1>
 
-                    <Typography variant="body1" paragraph sx={{ mb: 3 }}>
-                        Sua denúncia foi registrada sob o número:
-                    </Typography>
+                        <p className="lead mb-4 text-secondary">
+                            Sua denúncia foi recebida e será analisada.
+                        </p>
 
-                    <Typography
-                        variant="h4"
-                        sx={{
-                            fontWeight: 'bold',
-                            color: 'primary.main',
-                            py: 2,
-                            backgroundColor: '#f8f8f8',
-                            borderRadius: 1,
-                            mb: 3
-                        }}
-                    >
-                        {state.protocol}
-                    </Typography>
-
-                    <Alert severity="info" sx={{ mb: 3, textAlign: 'left' }}>
-                        <Typography variant="body2">
-                            <strong>Importante:</strong> Guarde este número para acompanhar o andamento da sua denúncia.
-                        </Typography>
-                    </Alert>
-
-                    <Divider sx={{ my: 3 }} />
-
-                    <Box sx={{
-                        display: 'flex',
-                        flexDirection: { xs: 'column', sm: 'row' },
-                        justifyContent: 'center',
-                        gap: 2
-                    }}>
-                        <Button
-                            variant="contained"
-                            startIcon={<SearchIcon />}
-                            onClick={handleGoToTracker}
-                            fullWidth={false}
-                            sx={{ minWidth: '200px' }}
+                        <div
+                            className="p-4 mb-4 rounded"
+                            style={{ backgroundColor: "#f8f9fa" }}
                         >
-                            Acompanhar denúncia
-                        </Button>
+                            <p className="fw-bold mb-1 text-secondary">
+                                Número de Protocolo:
+                            </p>
+                            <h2 className="h3 text-primary">
+                                {state.protocol}
+                            </h2>
+                            <p className="text-muted small mt-3">
+                                Guarde este número para acompanhar o status da sua denúncia
+                            </p>
+                        </div>
 
-                        <Button
-                            variant="outlined"
-                            startIcon={<HomeIcon />}
-                            onClick={handleGoToStart}
-                            fullWidth={false}
-                            sx={{ minWidth: '200px' }}
-                        >
-                            Voltar ao início
-                        </Button>
-                    </Box>
-                </Paper>
+                        <Row className="justify-content-center mt-4 g-3">
+                            <Col xs={12} sm="auto">
+                                <Button
+                                    variant="primary"
+                                    size="lg"
+                                    onClick={handleGoToTracker}
+                                    className="w-100"
+                                >
+                                    Acompanhar Denúncia
+                                </Button>
+                            </Col>
+                            <Col xs={12} sm="auto">
+                                <Button
+                                    variant="outline-secondary"
+                                    size="lg"
+                                    onClick={handleGoToStart}
+                                    className="w-100"
+                                >
+                                    Voltar ao Início
+                                </Button>
+                            </Col>
+                        </Row>
+                    </Card.Body>
+                </Card>
             </Container>
-        </Box>
+        </div>
     );
 }

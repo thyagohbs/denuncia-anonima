@@ -1,29 +1,28 @@
-import { Box, CircularProgress, Typography } from '@mui/material';
+import React from 'react';
+import { Spinner, Container } from 'react-bootstrap';
 
 export default function LoadingPage() {
     return (
-        <Box
-            sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
+        <Container
+            className="d-flex flex-column align-items-center justify-content-center"
+            style={{
                 height: '60vh',
-                width: '100%',
-                p: { xs: 2, sm: 3 }
+                padding: '0.5rem'
             }}
         >
-            <CircularProgress size={60} />
-            <Typography
-                variant="h6"
-                sx={{
-                    mt: 2,
-                    textAlign: 'center',
-                    fontSize: { xs: '1rem', sm: '1.25rem' }
+            <Spinner
+                animation="border"
+                role="status"
+                variant="primary"
+                style={{
+                    width: '3rem',
+                    height: '3rem',
+                    borderWidth: '4px'
                 }}
             >
-                Carregando...
-            </Typography>
-        </Box>
+                <span className="visually-hidden">Carregando...</span>
+            </Spinner>
+            <p className="mt-4 text-center">Carregando...</p>
+        </Container>
     );
 }

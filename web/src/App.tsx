@@ -1,8 +1,7 @@
 import './App.css';
-import { ThemeProvider } from './theme/ThemeProvider';
-import { AppRoutes } from './routes';
 import { useState, useEffect } from 'react';
-import { Box, CssBaseline } from '@mui/material';
+import { Container } from 'react-bootstrap';
+import { AppRoutes } from './routes';
 
 // Estender a interface Navigator para incluir a propriedade msMaxTouchPoints
 interface NavigatorWithMSTouch extends Navigator {
@@ -42,21 +41,13 @@ function App() {
   }, []);
 
   return (
-    <ThemeProvider>
-      <CssBaseline />
-      <Box
-        sx={{
-          minHeight: '100vh',
-          display: 'flex',
-          flexDirection: 'column',
-          ...(isTouch && {
-            WebkitTapHighlightColor: 'transparent',
-          }),
-        }}
-      >
-        <AppRoutes />
-      </Box>
-    </ThemeProvider>
+    <Container
+      fluid
+      className="d-flex flex-column px-0 min-vh-100"
+      style={isTouch ? { WebkitTapHighlightColor: "transparent" } : undefined}
+    >
+      <AppRoutes />
+    </Container>
   );
 }
 

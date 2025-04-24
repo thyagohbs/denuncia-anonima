@@ -1,406 +1,430 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import {
-    Box, Container, Typography, TextField, Button,
-    AppBar, Toolbar, IconButton, Paper,
-    CircularProgress, Alert, Grid, Tabs, Tab
-} from '@mui/material';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import LocationOnIcon from '@mui/icons-material/LocationOn';
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import ClearIcon from '@mui/icons-material/Clear';
-import useReportStore from '../../store/useReportStore';
-import MapComponent from './components/MapComponent';
-import { getAddressFromCoordinates, getCoordinatesFromAddress } from '../../services/geocodeService';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { Container, Row, Col, Button, Form, Tabs, Tab, Spinner } from "react-bootstrap";
+import { FaArrowLeft } from "react-icons/fa";
+import MapComponent from "./components/MapComponent";
+import useReportStore from "../../store/useReportStore";
+import axios from "axios";
+import { getAddressFromCoordinates } from "../../services/geocodeService";
 
-interface TabPanelProps {
-    children?: React.ReactNode;
-    index: number;
-    value: number;
+// Interface para os dados de endereço
+interface AddressFormData {
+  logradouro: string;
+  numero: string;
+  bairro: string;
+  cidade: string;
+  complemento: string;
+  pontoReferencia: string;
+  cep: string;
 }
 
-function TabPanel(props: TabPanelProps) {
-    const { children, value, index, ...other } = props;
-
-    return (
-        <div
-            role="tabpanel"
-            hidden={value !== index}
-            id={`location-tabpanel-${index}`}
-            aria-labelledby={`location-tab-${index}`}
-            {...other}
-        >
-            {value === index && (
-                <Box sx={{ pt: 2 }}>
-                    {children}
-                </Box>
-            )}
-        </div>
-    );
+// Interface para os erros de validação
+interface AddressFormErrors {
+  logradouro: string;
+  bairro: string;
+  cidade: string;
 }
 
 export default function LocationPage() {
-    const navigate = useNavigate();
-    const { formData, updateFormData } = useReportStore();
+  const navigate = useNavigate();
+  const { setLocation } = useReportStore();
+  const [activeTab, setActiveTab] = useState<string>("map");
+  const [markerPosition, setMarkerPosition] = useState<[number, number] | null>(null);
+  const [address, setAddress] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [validated, setValidated] = useState<boolean>(false);
 
-    // Estado para controlar qual aba está ativa
-    const [activeTab, setActiveTab] = useState(0);
+  // Estado para rastrear erros de validação
+  const [formErrors, setFormErrors] = useState<AddressFormErrors>({
+    logradouro: "",
+    bairro: "",
+    cidade: ""
+  });
 
-    const [address, setAddress] = useState(formData.localizacao?.endereco || '');
-    const [city, setCity] = useState(formData.localizacao?.cidade || '');
-    const [neighborhood, setNeighborhood] = useState(formData.localizacao?.bairro || '');
-    const [street, setStreet] = useState(formData.localizacao?.rua || '');
-    const [number, setNumber] = useState(formData.localizacao?.numero || '');
-    const [reference, setReference] = useState(formData.localizacao?.referencia || '');
+  // Estado para armazenar os dados detalhados do endereço
+  const [addressForm, setAddressForm] = useState<AddressFormData>({
+    logradouro: "",
+    numero: "",
+    bairro: "",
+    cidade: "",
+    complemento: "",
+    pontoReferencia: "",
+    cep: "",
+  });
 
-    const [latitude, setLatitude] = useState<number | undefined>(formData.localizacao?.latitude);
-    const [longitude, setLongitude] = useState<number | undefined>(formData.localizacao?.longitude);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-    const [success, setSuccess] = useState(false);
+  // Atualiza os campos do formulário quando um ponto é marcado no mapa
+  useEffect(() => {
+    if (markerPosition && activeTab === "address") {
+      fetchAddressFromCoordinates(markerPosition[0], markerPosition[1]);
+    }
+  }, [markerPosition, activeTab]);
 
-    const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
-        setActiveTab(newValue);
+  const handleBackClick = () => {
+    navigate(-1);
+  };
+
+  // Função para validar os campos obrigatórios
+  const validateForm = (): boolean => {
+    const errors: AddressFormErrors = {
+      logradouro: "",
+      bairro: "",
+      cidade: ""
     };
 
-    const handleBackClick = () => {
-        navigate('/home');
-    };
+    let isValid = true;
 
-    const handleLocationGet = async () => {
-        setLoading(true);
-        setError(null);
+    if (!addressForm.logradouro.trim()) {
+      errors.logradouro = "O endereço é obrigatório";
+      isValid = false;
+    }
 
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                async (position) => {
-                    const { latitude, longitude } = position.coords;
-                    setLatitude(latitude);
-                    setLongitude(longitude);
+    if (!addressForm.bairro.trim()) {
+      errors.bairro = "O bairro é obrigatório";
+      isValid = false;
+    }
 
-                    // Buscar endereço a partir das coordenadas
-                    try {
-                        const addressData = await getAddressFromCoordinates(latitude, longitude);
-                        if (addressData) {
-                            setCity(addressData.cidade);
-                            setNeighborhood(addressData.bairro);
-                            setStreet(addressData.rua);
-                            setNumber(addressData.numero || '');
-                            setAddress(addressData.endereco);
-                        }
-                        setSuccess(true);
-                    } catch (err) {
-                        console.error('Erro ao obter endereço:', err);
-                        // Mesmo sem endereço, temos as coordenadas
-                        setSuccess(true);
-                    }
+    if (!addressForm.cidade.trim()) {
+      errors.cidade = "A cidade é obrigatória";
+      isValid = false;
+    }
 
-                    setLoading(false);
-                },
-                (err) => {
-                    console.error('Erro de geolocalização:', err);
-                    setError('Não foi possível obter a localização. Por favor, insira o endereço manualmente.');
-                    setLoading(false);
-                }
-            );
-        } else {
-            setError('Seu navegador não suporta geolocalização.');
-            setLoading(false);
-        }
-    };
+    setFormErrors(errors);
+    return isValid;
+  };
 
-    const handleMapLocationSelect = async (lat: number, lng: number) => {
-        setLatitude(lat);
-        setLongitude(lng);
+  const handleContinue = () => {
+    setValidated(true);
 
-        // Buscar endereço a partir das coordenadas selecionadas no mapa
-        try {
-            setLoading(true);
-            const addressData = await getAddressFromCoordinates(lat, lng);
-            if (addressData) {
-                setCity(addressData.cidade);
-                setNeighborhood(addressData.bairro);
-                setStreet(addressData.rua);
-                setNumber(addressData.numero || '');
-                setAddress(addressData.endereco);
-            }
-            setSuccess(true);
-        } catch (err) {
-            console.error('Erro ao obter endereço:', err);
-        } finally {
-            setLoading(false);
-        }
-    };
+    // Verificar se está na aba de endereço e validar o formulário
+    if (activeTab === "address" && !validateForm()) {
+      return;
+    }
 
-    const handleSearchAddress = async () => {
-        if (!city || !neighborhood || !street) {
-            setError('Preencha pelo menos cidade, bairro e rua para buscar no mapa');
-            return;
-        }
+    // Verificar se temos um marcador no mapa ou se temos pelo menos os campos obrigatórios preenchidos
+    if (markerPosition || (activeTab === "address" && addressForm.logradouro && addressForm.bairro && addressForm.cidade)) {
+      // Criar uma string de endereço completa
+      const fullAddress = `${addressForm.logradouro}, ${addressForm.numero || 'S/N'}, ${addressForm.bairro}, ${addressForm.cidade}${addressForm.complemento ? `, ${addressForm.complemento}` : ''}`;
 
-        const addressQuery = `${street}${number ? ` ${number}` : ''}, ${neighborhood}, ${city}`;
+      // Se não tiver marcador no mapa, mas tiver preenchido o endereço, podemos prosseguir mesmo sem coordenadas
+      setLocation({
+        latitude: markerPosition ? markerPosition[0] : 0,
+        longitude: markerPosition ? markerPosition[1] : 0,
+        endereco: fullAddress
+      });
 
-        try {
-            setLoading(true);
-            setError(null);
+      navigate("/confirmation");
+    } else {
+      // Se estiver na aba do mapa e não tiver marcado nenhum ponto
+      if (activeTab === "map") {
+        alert("Por favor, selecione um local no mapa ou preencha o endereço manualmente.");
+      }
+    }
+  };
 
-            const coords = await getCoordinatesFromAddress(addressQuery);
+  const handleMapClick = async (lat: number, lng: number) => {
+    setMarkerPosition([lat, lng]);
+    fetchAddressFromCoordinates(lat, lng);
+    setActiveTab("address"); // Mudar para a aba de endereço após marcar no mapa
+  };
 
-            if (coords) {
-                setLatitude(coords.lat);
-                setLongitude(coords.lng);
-                setAddress(addressQuery);
-                setActiveTab(0); // Muda para a aba do mapa
-                setSuccess(true);
-            } else {
-                setError('Não foi possível encontrar o endereço informado');
-            }
-        } catch (err) {
-            console.error('Erro ao buscar coordenadas:', err);
-            setError('Erro ao buscar coordenadas do endereço');
-        } finally {
-            setLoading(false);
-        }
-    };
+  // Função para buscar endereço a partir de coordenadas
+  const fetchAddressFromCoordinates = async (lat: number, lng: number) => {
+    setIsLoading(true);
+    try {
+      const addressData = await getAddressFromCoordinates(lat, lng);
 
-    const clearLocation = () => {
-        setLatitude(undefined);
-        setLongitude(undefined);
-        setCity('');
-        setNeighborhood('');
-        setStreet('');
-        setNumber('');
-        setReference('');
-        setAddress('');
-        setSuccess(false);
-        setError(null);
-    };
+      if (addressData) {
+        setAddress(addressData.endereco);
 
-    const validateForm = () => {
-        // Verifica se pelo menos um método de localização foi preenchido
-        const hasMapLocation = latitude !== undefined && longitude !== undefined;
-        const hasManualAddress = city && neighborhood && street;
+        // Preencher os campos do formulário
+        setAddressForm({
+          logradouro: addressData.rua || "",
+          numero: addressData.numero || "",
+          bairro: addressData.bairro || "",
+          cidade: addressData.cidade || "",
+          complemento: "",
+          pontoReferencia: "",
+          cep: "", // A API OpenCage geralmente não retorna CEP
+        });
 
-        return hasMapLocation || hasManualAddress;
-    };
+        // Limpar erros de validação quando preenchemos pelo mapa
+        setFormErrors({
+          logradouro: "",
+          bairro: "",
+          cidade: ""
+        });
+      }
+    } catch (error) {
+      console.error("Erro ao obter endereço:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-    const handleSubmit = (event: React.FormEvent) => {
-        event.preventDefault();
+  // Função para buscar endereço por CEP
+  const handleCepSearch = async (cep: string) => {
+    if (cep.length !== 8) return;
 
-        if (!validateForm()) {
-            setError('Por favor, informe uma localização válida no mapa ou preencha o endereço manualmente.');
-            return;
-        }
+    setIsLoading(true);
+    try {
+      const response = await axios.get(`https://viacep.com.br/ws/${cep}/json/`);
 
-        // Monta objeto de localização com todos os dados disponíveis
-        const locationData = {
-            endereco: address || `${street}${number ? ` ${number}` : ''}, ${neighborhood}, ${city}`,
-            cidade: city,
-            bairro: neighborhood,
-            rua: street,
-            numero: number,
-            referencia: reference,
-            latitude,
-            longitude
-        };
+      if (!response.data.erro) {
+        setAddressForm({
+          ...addressForm,
+          logradouro: response.data.logradouro || "",
+          bairro: response.data.bairro || "",
+          cidade: response.data.localidade || "",
+          cep: cep
+        });
 
-        updateFormData({ localizacao: locationData });
-        navigate('/confirmation');
-    };
+        // Definir o endereço formatado
+        const formattedAddress = `${response.data.logradouro}, ${addressForm.numero}, ${response.data.bairro}, ${response.data.localidade}`;
+        setAddress(formattedAddress);
 
-    return (
-        <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-            <AppBar position="static">
-                <Toolbar>
-                    <IconButton
-                        edge="start"
-                        color="inherit"
-                        onClick={handleBackClick}
-                        aria-label="voltar"
-                    >
-                        <ArrowBackIcon />
-                    </IconButton>
-                    <Typography variant="h6" component="div" sx={{ flexGrow: .5 }}>
-                        Local da Ocorrência
-                    </Typography>
-                    <Button
-                        color="inherit"
-                        onClick={handleSubmit}
-                        disabled={!validateForm() || loading}
-                        sx={{ display: { xs: 'none', sm: 'block' } }}
-                    >
-                        {loading ? 'Processando...' : 'Continuar'}
-                    </Button>
-                </Toolbar>
-            </AppBar>
+        // Limpar erros de validação quando preenchemos pelo CEP
+        setFormErrors({
+          logradouro: "",
+          bairro: "",
+          cidade: ""
+        });
+      }
+    } catch (error) {
+      console.error("Erro ao buscar CEP:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-            <Container maxWidth="md" sx={{ py: 2, flexGrow: 1 }}>
-                <Box sx={{ mb: 3 }}>
-                    <Tabs
-                        value={activeTab}
-                        onChange={handleTabChange}
-                        variant="fullWidth"
-                        indicatorColor="primary"
-                    >
-                        <Tab label="Mapa" />
-                        <Tab label="Endereço" />
-                    </Tabs>
-                </Box>
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
 
-                {error && (
-                    <Alert severity="error" sx={{ mb: 2 }}>
-                        {error}
-                    </Alert>
+    setAddressForm(prev => ({
+      ...prev,
+      [name]: value
+    }));
+
+    // Limpar o erro deste campo específico se ele for preenchido
+    if (name === 'logradouro' || name === 'bairro' || name === 'cidade') {
+      if (value.trim()) {
+        setFormErrors(prev => ({
+          ...prev,
+          [name]: ""
+        }));
+      }
+    }
+
+    // Se for o CEP e tiver 8 dígitos, buscar automaticamente
+    if (name === "cep" && value.length === 8) {
+      handleCepSearch(value);
+    }
+  };
+
+
+  return (
+    <div className="d-flex flex-column min-vh-100">
+      <header className="bg-primary text-white">
+        <div className="d-flex align-items-center py-2 px-3">
+          <Button
+            variant="link"
+            className="text-white p-1"
+            onClick={handleBackClick}
+            aria-label="voltar"
+          >
+            <FaArrowLeft />
+          </Button>
+          <h1 className="h5 mb-0 ms-2 flex-grow-1">
+            Localização da Ocorrência
+          </h1>
+        </div>
+      </header>
+
+      <Container className="py-4 flex-grow-1">
+        <Row className="mb-4">
+          <Col>
+            <p>
+              Indique o local onde ocorreu o fato denunciado. Você pode selecionar no mapa
+              ou informar o endereço completo.
+            </p>
+          </Col>
+        </Row>
+
+        <Tabs
+          activeKey={activeTab}
+          onSelect={(k) => k && setActiveTab(k)}
+          className="mb-4"
+        >
+          <Tab eventKey="map" title="Selecionar no Mapa">
+            <div className="p-2">
+              <MapComponent
+                onClick={handleMapClick}
+                markerPosition={markerPosition}
+              />
+            </div>
+          </Tab>
+          <Tab eventKey="address" title="Informar Endereço">
+            <div className="p-3 border border-top-0 rounded-bottom">
+              {isLoading && (
+                <div className="text-center my-3">
+                  <Spinner animation="border" variant="primary" size="sm" />
+                  <span className="ms-2">Carregando informações...</span>
+                </div>
+              )}
+
+              <Form className="form-horizontal" noValidate validated={validated}>
+                <Form.Group as={Row} className="mb-3 align-items-center">
+                  <Form.Label column sm={3} className="text-sm-end">
+                    CEP
+                  </Form.Label>
+                  <Col sm={4}>
+                    <Form.Control
+                      type="text"
+                      name="cep"
+                      value={addressForm.cep}
+                      onChange={handleInputChange}
+                      maxLength={8}
+                      placeholder="Digite o CEP (Não obrigatório)"
+                    />
+                  </Col>
+                </Form.Group>
+
+                <Form.Group as={Row} className="mb-3 align-items-center">
+                  <Form.Label column sm={3} className="text-sm-end">
+                    Endereço *
+                  </Form.Label>
+                  <Col sm={9}>
+                    <Form.Control
+                      type="text"
+                      name="logradouro"
+                      value={addressForm.logradouro}
+                      onChange={handleInputChange}
+                      placeholder="Digite o endereço (Obrigatório)"
+                      isInvalid={validated && !!formErrors.logradouro}
+                      required
+                    />
+                    <Form.Control.Feedback type="invalid">
+                      {formErrors.logradouro}
+                    </Form.Control.Feedback>
+                  </Col>
+                </Form.Group>
+
+                <Form.Group as={Row} className="mb-3 align-items-center">
+                  <Form.Label column sm={3} className="text-sm-end">
+                    Número
+                  </Form.Label>
+                  <Col sm={3}>
+                    <Form.Control
+                      type="text"
+                      name="numero"
+                      value={addressForm.numero}
+                      onChange={handleInputChange}
+                      placeholder="Digite o número(Não é obrigatório)"
+                    />
+                  </Col>
+                </Form.Group>
+
+                <Form.Group as={Row} className="mb-3 align-items-center">
+                  <Form.Label column sm={3} className="text-sm-end">
+                    Bairro *
+                  </Form.Label>
+                  <Col sm={9}>
+                    <Form.Control
+                      type="text"
+                      name="bairro"
+                      value={addressForm.bairro}
+                      placeholder="Digite o bairro (Obrigatório)"
+                      onChange={handleInputChange}
+                      isInvalid={validated && !!formErrors.bairro}
+                      required
+                    />
+                    <Form.Control.Feedback type="invalid">
+                      {formErrors.bairro}
+                    </Form.Control.Feedback>
+                  </Col>
+                </Form.Group>
+
+                <Form.Group as={Row} className="mb-3 align-items-center">
+                  <Form.Label column sm={3} className="text-sm-end">
+                    Cidade *
+                  </Form.Label>
+                  <Col sm={9}>
+                    <Form.Control
+                      type="text"
+                      name="cidade"
+                      value={addressForm.cidade}
+                      placeholder="Digite a cidade (Obrigatório)"
+                      onChange={handleInputChange}
+                      isInvalid={validated && !!formErrors.cidade}
+                      required
+                    />
+                    <Form.Control.Feedback type="invalid">
+                      {formErrors.cidade}
+                    </Form.Control.Feedback>
+                  </Col>
+                </Form.Group>
+
+                <Form.Group as={Row} className="mb-3 align-items-center">
+                  <Form.Label column sm={3} className="text-sm-end">
+                    Complemento
+                  </Form.Label>
+                  <Col sm={9}>
+                    <Form.Control
+                      type="text"
+                      name="complemento"
+                      value={addressForm.complemento}
+                      placeholder="Digite o complemento (Não é obrigatório)"
+                      onChange={handleInputChange}
+                    />
+                  </Col>
+                </Form.Group>
+
+                <Form.Group as={Row} className="mb-3 align-items-center">
+                  <Form.Label column sm={3} className="text-sm-end">
+                    Ponto de Referência
+                  </Form.Label>
+                  <Col sm={9}>
+                    <Form.Control
+                      type="text"
+                      name="pontoReferencia"
+                      value={addressForm.pontoReferencia}
+                      placeholder="Digite o ponto de referência (Não é obrigatório)"
+                      onChange={handleInputChange}
+                    />
+                  </Col>
+                </Form.Group>
+
+                {activeTab === "address" && (
+                  <Row className="mb-0">
+                    <Col sm={{ span: 9, offset: 3 }}>
+                      <small className="text-muted">* Campos obrigatórios</small>
+                    </Col>
+                  </Row>
                 )}
+              </Form>
+            </div>
+          </Tab>
+        </Tabs>
 
-                {success && (
-                    <Alert severity="success" sx={{ mb: 2 }}>
-                        Localização definida com sucesso!
-                    </Alert>
-                )}
-
-                <TabPanel value={activeTab} index={0}>
-                    <Paper sx={{ p: 2, mb: 3 }}>
-                        <Box sx={{ mb: 2 }}>
-                            <Button
-                                variant="outlined"
-                                startIcon={loading ? <CircularProgress size={20} /> : <LocationOnIcon />}
-                                onClick={handleLocationGet}
-                                disabled={loading}
-                                fullWidth
-                                sx={{ mb: 2 }}
-                            >
-                                {loading ? 'Obtendo localização...' : 'Usar minha localização atual'}
-                            </Button>
-                        </Box>
-
-                        <MapComponent
-                            latitude={latitude}
-                            longitude={longitude}
-                            onSelectLocation={handleMapLocationSelect}
-                        />
-
-                        {(latitude !== undefined && longitude !== undefined) && (
-                            <Box sx={{ mt: 2 }}>
-                                <Typography variant="subtitle2" gutterBottom>
-                                    Coordenadas: {latitude.toFixed(6)}, {longitude.toFixed(6)}
-                                </Typography>
-
-                                {address && (
-                                    <Typography variant="body2" gutterBottom>
-                                        Endereço: {address}
-                                    </Typography>
-                                )}
-
-                                <Button
-                                    startIcon={<ClearIcon />}
-                                    onClick={clearLocation}
-                                    size="small"
-                                    sx={{ mt: 1 }}
-                                >
-                                    Limpar localização
-                                </Button>
-                            </Box>
-                        )}
-                    </Paper>
-                </TabPanel>
-
-                <TabPanel value={activeTab} index={1}>
-                    <Paper sx={{ p: 2, mb: 3 }}>
-                        <form>
-                            <Grid container spacing={2}>
-                                <Grid size={{ xs: 12 }}>
-                                    <TextField
-                                        required
-                                        fullWidth
-                                        label="Cidade"
-                                        value={city}
-                                        onChange={(e) => setCity(e.target.value)}
-                                        variant="outlined"
-                                        margin="normal"
-                                        error={!city && !!error}
-                                    />
-                                </Grid>
-                                <Grid size={{ xs: 12 }}>
-                                    <TextField
-                                        required
-                                        fullWidth
-                                        label="Bairro"
-                                        value={neighborhood}
-                                        onChange={(e) => setNeighborhood(e.target.value)}
-                                        variant="outlined"
-                                        margin="normal"
-                                        error={!neighborhood && !!error}
-                                    />
-                                </Grid>
-                                <Grid size={{ xs: 8 }}>
-                                    <TextField
-                                        required
-                                        fullWidth
-                                        label="Rua"
-                                        value={street}
-                                        onChange={(e) => setStreet(e.target.value)}
-                                        variant="outlined"
-                                        margin="normal"
-                                        error={!street && !!error}
-                                    />
-                                </Grid>
-                                <Grid size={{ xs: 4 }}>
-                                    <TextField
-                                        fullWidth
-                                        label="Número"
-                                        value={number}
-                                        onChange={(e) => setNumber(e.target.value)}
-                                        variant="outlined"
-                                        margin="normal"
-                                    />
-                                </Grid>
-                                <Grid size={{ xs: 12 }}>
-
-                                    <TextField
-                                        fullWidth
-                                        label="Ponto de referência"
-                                        value={reference}
-                                        onChange={(e) => setReference(e.target.value)}
-                                        variant="outlined"
-                                        margin="normal"
-                                    />
-                                </Grid>
-                                <Grid size={{ xs: 12 }}>
-
-                                    <Button
-                                        variant="outlined"
-                                        onClick={handleSearchAddress}
-                                        disabled={loading || !city || !neighborhood || !street}
-                                        startIcon={loading ? <CircularProgress size={20} /> : <LocationOnIcon />}
-                                        sx={{ mt: 1 }}
-                                    >
-                                        Buscar no mapa
-                                    </Button>
-                                </Grid>
-                            </Grid>
-                        </form>
-                    </Paper>
-                </TabPanel>
-
-                <Box sx={{ mt: 2, display: 'flex', justifyContent: 'space-between' }}>
-                    <Button
-                        variant="outlined"
-                        onClick={handleBackClick}
-                        startIcon={<ArrowBackIcon />}
-                    >
-                        Voltar
-                    </Button>
-                    <Button
-                        variant="contained"
-                        onClick={handleSubmit}
-                        endIcon={<ArrowForwardIcon />}
-                        disabled={!validateForm() || loading}
-                    >
-                        Próximo
-                    </Button>
-                </Box>
-            </Container>
-        </Box>
-    );
+        <div className="d-flex justify-content-between mt-4">
+          <Button
+            variant="outline-secondary"
+            onClick={handleBackClick}
+          >
+            Voltar
+          </Button>
+          <Button
+            variant="primary"
+            onClick={handleContinue}
+            disabled={
+              activeTab === "map"
+                ? !markerPosition
+                : !(addressForm.logradouro && addressForm.bairro && addressForm.cidade)
+            }
+          >
+            Continuar
+          </Button>
+        </div>
+      </Container>
+    </div>
+  );
 }

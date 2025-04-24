@@ -1,34 +1,35 @@
-import { Link as RouterLink } from 'react-router-dom';
-import { Box, Button, Container, Typography, Paper } from '@mui/material';
-import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
-import HomeIcon from '@mui/icons-material/Home';
+import { Container, Card, Button } from "react-bootstrap";
+import { FaHome, FaExclamationTriangle } from "react-icons/fa";
 
 export default function NotFoundPage() {
-    return (
-        <Container maxWidth="sm">
-            <Box sx={{ my: 8, textAlign: 'center' }}>
-                <Paper elevation={2} sx={{ p: 4, borderRadius: 2 }}>
-                    <ErrorOutlineIcon sx={{ fontSize: 80, color: 'text.secondary', mb: 2 }} />
+  return (
+    <Container className="my-5 d-flex flex-column align-items-center">
+      <Card
+        className="text-center shadow-sm p-4"
+        style={{ maxWidth: "500px" }}
+      >
+        <Card.Body>
+          <FaExclamationTriangle
+            className="text-warning mb-3"
+            size={50}
+          />
 
-                    <Typography variant="h4" gutterBottom fontWeight="bold">
-                        Página Não Encontrada
-                    </Typography>
+          <h1 className="h3 mb-3">Página não encontrada</h1>
 
-                    <Typography variant="body1" color="text.secondary" paragraph>
-                        A página que você está procurando não existe ou foi removida.
-                    </Typography>
+          <p className="lead mb-4">
+            Desculpe, a página que você está procurando não existe.
+          </p>
 
-                    <Button
-                        component={RouterLink}
-                        to="/"
-                        variant="contained"
-                        startIcon={<HomeIcon />}
-                        sx={{ mt: 2 }}
-                    >
-                        Voltar para a página inicial
-                    </Button>
-                </Paper>
-            </Box>
-        </Container>
-    );
+          <Button
+            // as={Link}
+            //to="/"
+            variant="primary"
+          >
+            <FaHome className="me-2" />
+            Voltar para Início
+          </Button>
+        </Card.Body>
+      </Card>
+    </Container>
+  );
 }
