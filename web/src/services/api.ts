@@ -16,7 +16,7 @@ export interface ReportData {
   dataOcorrencia?: string;
 }
 
-// Criação da instância Axios para uso geral sem autenticação
+// Criação da instância Axios para uso geral
 const api = axios.create({
   baseURL: API_URL,
   headers: {
@@ -24,7 +24,7 @@ const api = axios.create({
   },
 });
 
-// Interceptor apenas para logs e tratamento básico de erros
+// Interceptor para logs e tratamento básico de erros
 api.interceptors.response.use(
   (response) => {
     if (env.isDevelopment) {
@@ -66,15 +66,16 @@ export const submitAnonymousReport = async (reportData: ReportData) => {
   }
 };
 
-interface LocationData {
-  endereco?: string;
-  latitude?: number;
-  longitude?: number;
-}
-
+// Atualize a interface DenunciaData para incluir os novos campos
 interface DenunciaData {
   tipo: string;
-  localizacao: LocationData;
+  localizacao: {
+    endereco: string;
+    latitude: number;
+    longitude: number;
+  };
+  descricaoOcorrido: string; // Novo campo para descrição do ocorrido
+  descricaoSuspeito: string; // Novo campo para descrição do suspeito
 }
 
 interface DenunciaResponse {

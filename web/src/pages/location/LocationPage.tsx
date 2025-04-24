@@ -112,7 +112,7 @@ export default function LocationPage() {
         endereco: fullAddress
       });
 
-      navigate("/confirmation");
+      navigate("/descricao");
     } else {
       // Se estiver na aba do mapa e não tiver marcado nenhum ponto
       if (activeTab === "map") {

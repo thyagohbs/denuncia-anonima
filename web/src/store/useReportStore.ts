@@ -23,6 +23,8 @@ export interface FormData {
   tipo: ReportType | null;
   localizacao: Location | null;
   detalhes?: string | null;
+  descricaoOcorrido?: string | null; // Novo campo
+  descricaoSuspeito?: string | null; // Novo campo
   // adicione mais campos conforme necessário
 }
 
@@ -43,6 +45,9 @@ interface ReportStore {
   // Método para atualizar formData diretamente
   updateFormData: (data: Partial<FormData>) => void;
 
+  setDescricaoOcorrido: (descricao: string) => void;
+  setDescricaoSuspeito: (descricao: string) => void;
+
   resetReport: () => void;
 }
 
@@ -51,6 +56,8 @@ const initialFormData: FormData = {
   tipo: null,
   localizacao: null,
   detalhes: null,
+  descricaoOcorrido: null,
+  descricaoSuspeito: null,
 };
 
 const useReportStore = create<ReportStore>((set) => ({
@@ -94,6 +101,22 @@ const useReportStore = create<ReportStore>((set) => ({
   updateFormData: (data) =>
     set((state) => ({
       formData: { ...state.formData, ...data },
+    })),
+
+  setDescricaoOcorrido: (descricao) =>
+    set((state) => ({
+      formData: {
+        ...state.formData,
+        descricaoOcorrido: descricao,
+      },
+    })),
+
+  setDescricaoSuspeito: (descricao) =>
+    set((state) => ({
+      formData: {
+        ...state.formData,
+        descricaoSuspeito: descricao,
+      },
     })),
 
   // Reset do estado

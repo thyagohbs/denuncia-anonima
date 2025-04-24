@@ -2,10 +2,10 @@ import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom'
 import StartPage from '../pages/StartPage';
 import HomePage from '../pages/home/HomePage';
 import LocationPage from '../pages/location/LocationPage';
-import ConfirmationPage from '../pages/confirmation/ConfirmationPage';
 import SuccessPage from '../pages/success/SuccessPage';
 import NotFoundPage from '../pages/NotFoundPage';
 import TrackerPage from '../pages/tracker/TrackerPage';
+import DescricaoPage from '../pages/descricao/DescricaoPage';
 
 const router = createBrowserRouter([
     {
@@ -28,8 +28,8 @@ const router = createBrowserRouter([
                 element: <LocationPage />
             },
             {
-                path: 'confirmation',
-                element: <ConfirmationPage />
+                path: 'descricao',
+                element: <DescricaoPage />
             },
             {
                 path: 'success',
