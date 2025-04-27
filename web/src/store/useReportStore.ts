@@ -1,32 +1,5 @@
 import { create } from "zustand";
-
-export type ReportType =
-  | "VIOLENCIA_FISICA"
-  | "VIOLENCIA_SEXUAL"
-  | "AMEACA"
-  | "INTOLERANCIA"
-  | "ABUSO_AUTORIDADE"
-  | "FURTO"
-  | "ROUBO"
-  | "AGRESSAO"
-  | "DANO_AO_PATRIMONIO"
-  | "OUTROS";
-
-export interface Location {
-  latitude: number;
-  longitude: number;
-  endereco: string;
-}
-
-// Interface para formData
-export interface FormData {
-  tipo: ReportType | null;
-  localizacao: Location | null;
-  detalhes?: string | null;
-  descricaoOcorrido?: string | null; // Novo campo
-  descricaoSuspeito?: string | null; // Novo campo
-  // adicione mais campos conforme necessário
-}
+import { ReportType, Location, FormData } from "../types/report";
 
 interface ReportStore {
   // Mantenha as propriedades individuais para compatibilidade

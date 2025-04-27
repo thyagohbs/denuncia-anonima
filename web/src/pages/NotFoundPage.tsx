@@ -1,5 +1,6 @@
-import { Container, Card, Button } from "react-bootstrap";
+import { Container, Card } from "react-bootstrap";
 import { FaHome, FaExclamationTriangle } from "react-icons/fa";
+import { Link } from "react-router-dom";
 
 export default function NotFoundPage() {
   return (
@@ -20,14 +21,10 @@ export default function NotFoundPage() {
             Desculpe, a página que você está procurando não existe.
           </p>
 
-          <Button
-            // as={Link}
-            //to="/"
-            variant="primary"
-          >
+          <Link to="/" className="btn btn-primary">
             <FaHome className="me-2" />
             Voltar para Início
-          </Button>
+          </Link>
         </Card.Body>
       </Card>
     </Container>

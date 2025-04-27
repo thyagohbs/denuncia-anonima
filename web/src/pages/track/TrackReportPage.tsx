@@ -12,36 +12,10 @@ import {
     Badge
 } from 'react-bootstrap';
 import { FaSearch } from 'react-icons/fa';
-import api from '../../services/api';
 import axios from 'axios';
-
-// Interface para o status de denúncia
-interface Report {
-    protocolo: string;
-    tipo: string;
-    status: string;
-    detalhes: string;
-    criadoEm: string;
-    atualizadoEm: string;
-}
-
-// Mapeamento de status para exibição
-const statusLabels: Record<string, string> = {
-    'recebida': 'Recebida',
-    'em_analise': 'Em Análise',
-    'em_investigacao': 'Em Investigação',
-    'concluida': 'Concluída',
-    'arquivada': 'Arquivada'
-};
-
-// Mapeamento de cores para os status
-const statusVariants: Record<string, string> = {
-    'recebida': 'info',
-    'em_analise': 'primary',
-    'em_investigacao': 'warning',
-    'concluida': 'success',
-    'arquivada': 'secondary'
-};
+import { Report } from '../../types/report';
+import { STATUS_LABELS, STATUS_VARIANTS } from '../../constants/reportConstants';
+import { getDenuncia } from '../../services/api';
 
 export default function TrackReportPage() {
     const location = useLocation();
@@ -69,8 +43,8 @@ export default function TrackReportPage() {
         setReport(null);
 
         try {
-            const response = await api.get(`/reports/protocolo/${protocol}`);
-            setReport(response.data);
+            const response = await getDenuncia(protocol);
+            setReport(response);
         } catch (err: unknown) {
             console.error('Erro ao buscar denúncia:', err);
 
@@ -168,11 +142,11 @@ export default function TrackReportPage() {
                                         Protocolo: {report.protocolo}
                                     </h2>
                                     <Badge
-                                        bg={statusVariants[report.status] || "secondary"}
+                                        bg={STATUS_VARIANTS[report.status] || "secondary"}
                                         pill
                                         className="px-3 py-2"
                                     >
-                                        {statusLabels[report.status] || report.status}
+                                        {STATUS_LABELS[report.status] || report.status}
                                     </Badge>
                                 </div>
 

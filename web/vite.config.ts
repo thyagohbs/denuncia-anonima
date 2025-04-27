@@ -10,11 +10,7 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      // Redireciona importações de @chakra-ui/icons para nosso wrapper
-      "@chakra-ui/icons": path.resolve(
-        __dirname,
-        "./src/components/common/ChakraIconsWrapper.tsx"
-      ),
+      "@": path.resolve(__dirname, "./src"),
     },
   },
 });

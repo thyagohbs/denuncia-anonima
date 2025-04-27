@@ -7,43 +7,46 @@ import NotFoundPage from '../pages/NotFoundPage';
 import TrackerPage from '../pages/tracker/TrackerPage';
 import DescricaoPage from '../pages/descricao/DescricaoPage';
 
+// Centralizar configurações de rota
+const routes = [
+    {
+        path: '/',
+        element: <Navigate to="/start" replace />
+    },
+    {
+        path: 'start',
+        element: <StartPage />
+    },
+    {
+        path: 'home',
+        element: <HomePage />
+    },
+    {
+        path: 'local',
+        element: <LocationPage />
+    },
+    {
+        path: 'descricao',
+        element: <DescricaoPage />
+    },
+    {
+        path: 'success',
+        element: <SuccessPage />
+    },
+    {
+        path: 'track',
+        element: <TrackerPage />
+    },
+    {
+        path: '*',
+        element: <NotFoundPage />
+    }
+];
+
 const router = createBrowserRouter([
     {
         path: '/',
-        children: [
-            {
-                index: true,
-                element: <Navigate to="/start" replace />
-            },
-            {
-                path: 'start',
-                element: <StartPage />
-            },
-            {
-                path: 'home',
-                element: <HomePage />
-            },
-            {
-                path: 'local',
-                element: <LocationPage />
-            },
-            {
-                path: 'descricao',
-                element: <DescricaoPage />
-            },
-            {
-                path: 'success',
-                element: <SuccessPage />
-            },
-            {
-                path: 'track',
-                element: <TrackerPage />
-            },
-            {
-                path: '*',
-                element: <NotFoundPage />
-            }
-        ]
+        children: routes
     }
 ]);
 

@@ -1,20 +1,10 @@
 import axios, { AxiosError } from "axios";
 import { env } from "../config/env";
-
+import { DenunciaData, DenunciaResponse, FormData } from "../types/report";
 // URL base do serviço de API
 const API_URL = env.isDevelopment
   ? "http://localhost:3000"
   : process.env.REACT_APP_API_URL || "https://api.denunciaanonima.com.br";
-
-// Interface para os dados de denúncia
-export interface ReportData {
-  tipo: string;
-  detalhes: string;
-  localizacao: string;
-  // Adicione outros campos conforme necessário
-  anexos?: File[];
-  dataOcorrencia?: string;
-}
 
 // Criação da instância Axios para uso geral
 const api = axios.create({
@@ -55,40 +45,11 @@ api.interceptors.response.use(
   }
 );
 
-// Função específica para enviar denúncias anônimas
-export const submitAnonymousReport = async (reportData: ReportData) => {
-  try {
-    const response = await api.post("/reports", reportData);
-    return response.data;
-  } catch (error) {
-    console.error("Erro ao enviar denúncia anônima:", error);
-    throw error;
-  }
-};
-
-// Atualize a interface DenunciaData para incluir os novos campos
-interface DenunciaData {
-  tipo: string;
-  localizacao: {
-    endereco: string;
-    latitude: number;
-    longitude: number;
-  };
-  descricaoOcorrido: string; // Novo campo para descrição do ocorrido
-  descricaoSuspeito: string; // Novo campo para descrição do suspeito
-}
-
-interface DenunciaResponse {
-  protocolo: string;
-  status: string;
-  dataRegistro: string;
-}
-
 export const submitDenuncia = async (
-  data: DenunciaData
+  data: DenunciaData | FormData
 ): Promise<DenunciaResponse> => {
   try {
-    const response = await api.post("/denuncias", data);
+    const response = await api.post("/reports", data);
     return response.data;
   } catch (error) {
     console.error("Erro ao enviar denúncia:", error);
@@ -98,7 +59,7 @@ export const submitDenuncia = async (
 
 export const getDenuncia = async (protocolo: string) => {
   try {
-    const response = await api.get(`/denuncias/${protocolo}`);
+    const response = await api.get(`/reports/protocolo/${protocolo}`);
     return response.data;
   } catch (error) {
     console.error("Erro ao buscar denúncia:", error);
