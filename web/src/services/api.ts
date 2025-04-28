@@ -1,6 +1,5 @@
 import axios, { AxiosError } from "axios";
 import { env } from "../config/env";
-import { DenunciaData, DenunciaResponse, FormData } from "../types/report";
 // URL base do serviço de API
 const API_URL = env.isDevelopment
   ? "http://localhost:3000"
@@ -44,27 +43,5 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
-
-export const submitDenuncia = async (
-  data: DenunciaData | FormData
-): Promise<DenunciaResponse> => {
-  try {
-    const response = await api.post("/reports", data);
-    return response.data;
-  } catch (error) {
-    console.error("Erro ao enviar denúncia:", error);
-    throw error;
-  }
-};
-
-export const getDenuncia = async (protocolo: string) => {
-  try {
-    const response = await api.get(`/reports/protocolo/${protocolo}`);
-    return response.data;
-  } catch (error) {
-    console.error("Erro ao buscar denúncia:", error);
-    throw error;
-  }
-};
 
 export default api;

@@ -1,6 +1,11 @@
 import { useState } from "react";
-import { getDenuncia, submitDenuncia } from "./api";
-import { FormData, DenunciaData, SubmitReportResult } from "../types/report";
+import api from "./api";
+import {
+  FormData,
+  DenunciaData,
+  DenunciaResponse,
+  SubmitReportResult,
+} from "../types/report";
 
 // Hook simplificado para gerenciar operações de denúncia
 export function useReportService() {
@@ -44,6 +49,28 @@ export function useReportService() {
       throw new Error(message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const submitDenuncia = async (
+    data: DenunciaData | FormData
+  ): Promise<DenunciaResponse> => {
+    try {
+      const response = await api.post("/reports", data);
+      return response.data;
+    } catch (error) {
+      console.error("Erro ao enviar denúncia:", error);
+      throw error;
+    }
+  };
+
+  const getDenuncia = async (protocolo: string) => {
+    try {
+      const response = await api.get(`/reports/protocolo/${protocolo}`);
+      return response.data;
+    } catch (error) {
+      console.error("Erro ao buscar denúncia:", error);
+      throw error;
     }
   };
 

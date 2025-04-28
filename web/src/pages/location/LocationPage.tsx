@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { Container, Row, Col, Button, Form, Tabs, Tab, Spinner } from "react-bootstrap";
 import { FaArrowLeft } from "react-icons/fa";
 import MapComponent from "./components/MapComponent";
-import useReportStore from "../../store/useReportStore";
+import { useAppDispatch } from "../../redux/hooks";
+import { setLocation } from "../../redux/slices/reportSlice";
 import axios from "axios";
 import { getAddressFromCoordinates } from "../../services/geocodeService";
 
@@ -27,7 +28,7 @@ interface AddressFormErrors {
 
 export default function LocationPage() {
   const navigate = useNavigate();
-  const { setLocation } = useReportStore();
+  const dispatch = useAppDispatch();
   const [activeTab, setActiveTab] = useState<string>("map");
   const [markerPosition, setMarkerPosition] = useState<[number, number] | null>(null);
   const [address, setAddress] = useState<string>("");
@@ -106,11 +107,11 @@ export default function LocationPage() {
       const fullAddress = `${addressForm.logradouro}, ${addressForm.numero || 'S/N'}, ${addressForm.bairro}, ${addressForm.cidade}${addressForm.complemento ? `, ${addressForm.complemento}` : ''}`;
 
       // Se não tiver marcador no mapa, mas tiver preenchido o endereço, podemos prosseguir mesmo sem coordenadas
-      setLocation({
+      dispatch(setLocation({
         latitude: markerPosition ? markerPosition[0] : 0,
         longitude: markerPosition ? markerPosition[1] : 0,
         endereco: fullAddress
-      });
+      }));
 
       navigate("/descricao");
     } else {

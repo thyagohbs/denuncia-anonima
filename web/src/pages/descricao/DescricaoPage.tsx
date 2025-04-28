@@ -12,23 +12,16 @@ import {
     Form
 } from "react-bootstrap";
 import { FaArrowLeft, FaPaperPlane } from "react-icons/fa";
-import useReportStore from "../../store/useReportStore";
-import { submitDenuncia } from "../../services/api";
+import { useAppSelector } from "../../redux/hooks";
+import { useReportService } from "../../services/reportService";
 
-const typeLabels: Record<string, string> = {
-    'FURTO': 'Furto',
-    'ROUBO': 'Roubo',
-    'AGRESSAO': 'Agressão',
-    'DANO_AO_PATRIMONIO': 'Dano ao Patrimônio',
-    'OUTROS': 'Outros'
-};
+const typeLabels: Record<string, string> = {};
 
 export default function DescricaoPage() {
     const navigate = useNavigate();
-    const { reportType, location } = useReportStore();
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
+    const { reportType, location } = useAppSelector(state => state.report);
     const [validated, setValidated] = useState(false);
+    const { submitDenuncia, loading, error } = useReportService();
 
     // Estados para os campos de descrição
     const [descricaoOcorrido, setDescricaoOcorrido] = useState("");
@@ -54,9 +47,6 @@ export default function DescricaoPage() {
             return;
         }
 
-        setLoading(true);
-        setError(null);
-
         try {
             const response = await submitDenuncia({
                 tipo: reportType,
@@ -70,13 +60,10 @@ export default function DescricaoPage() {
             });
 
             navigate('/sucesso', {
-                state: { protocolo: response.protocolo }
+                state: { protocolo: response.protocol }
             });
         } catch (err) {
             console.error('Erro ao enviar denúncia:', err);
-            setError('Ocorreu um erro ao enviar a denúncia. Por favor, tente novamente.');
-        } finally {
-            setLoading(false);
         }
     };
 

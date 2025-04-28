@@ -1,17 +1,19 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Card, Button } from 'react-bootstrap';
 import { FaBan, FaSadTear, FaFemale, FaMicrophone, FaGavel, FaArrowLeft } from 'react-icons/fa';
-import useReportStore, { ReportType } from '../../store/useReportStore';
+import { ReportType } from '../../types/report';
+import { useAppDispatch } from '../../redux/hooks';
+import { setReportType } from '../../redux/slices/reportSlice';
 
 export default function HomePage() {
     const [selected, setSelected] = useState<string | null>(null);
     const navigate = useNavigate();
-    const { setReportType } = useReportStore();
+    const dispatch = useAppDispatch();
 
     const handleTypeSelect = (type: string) => {
         setSelected(type);
-        setReportType(type as ReportType);
+        dispatch(setReportType(type as ReportType));
         setTimeout(() => navigate("/local"), 300);
     };
 
