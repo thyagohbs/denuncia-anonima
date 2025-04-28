@@ -15,7 +15,9 @@ export class UsersService {
     private usersRepository: Repository<User>,
   ) {}
 
-  async create(createUserDto: CreateUserDto): Promise<Omit<User, 'password'>> {
+  async create(
+    createUserDto: CreateUserDto,
+  ): Promise<Pick<User, 'id' | 'email' | 'roles' | 'reports'>> {
     const existingUser = await this.findByEmail(createUserDto.email);
     if (existingUser) {
       throw new ConflictException('Email já está em uso');
@@ -27,12 +29,13 @@ export class UsersService {
     });
     await this.usersRepository.save(user);
 
-    const { password, ...result } = user;
+    const { ...result } = user;
     return result;
   }
 
   async findByEmail(email: string): Promise<User | undefined> {
-    return this.usersRepository.findOne({ where: { email } }) || undefined;
+    const user = await this.usersRepository.findOne({ where: { email } });
+    return user || undefined;
   }
 
   async findAll(): Promise<User[]> {

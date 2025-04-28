@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DeepPartial, Repository } from 'typeorm';
 import { Report, ReportType } from './entities/report.entity';
 import { CreateReportDto } from './dto/create-report.dto';
 import { ProtocoloService } from './services/protocolo.service';
@@ -17,13 +17,15 @@ export class ReportsService {
     createReportDto: CreateReportDto,
     userId?: number,
   ): Promise<Report> {
+    // Remova o DeepPartial explícito e deixe o TypeORM inferir os tipos
     const report = this.reportsRepository.create({
       ...createReportDto,
       protocolo: this.protocoloService.gerarProtocolo(),
-      user: userId ? { id: userId } : null,
+      // Use undefined em vez de uma estrutura com objeto quando não houver userId
+      ...(userId ? { user: { id: userId } } : {}),
     });
 
-    return this.reportsRepository.save(report);
+    return await this.reportsRepository.save(report);
   }
 
   async findAll(tipo?: ReportType): Promise<Report[]> {

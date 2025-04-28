@@ -4,16 +4,11 @@ import {
   PrimaryGeneratedColumn,
   ManyToOne,
   CreateDateColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
-
-export enum ReportType {
-  FURTO = 'furto',
-  ROUBO = 'roubo',
-  AGRESSAO = 'agressao',
-  DANO_AO_PATRIMONIO = 'dano_ao_patrimonio',
-  OUTROS = 'outros',
-}
+import { ReportType } from '../enums/report-type.enum';
+import { ReportStatus } from '../enums/report-status.enum';
 
 @Entity()
 export class Report {
@@ -31,7 +26,10 @@ export class Report {
   };
 
   @Column('text')
-  detalhes: string;
+  descricaoOcorrido: string;
+
+  @Column({ type: 'text', nullable: true })
+  descricaoSuspeito?: string;
 
   @Column({ unique: true })
   protocolo: string;
@@ -39,6 +37,17 @@ export class Report {
   @CreateDateColumn()
   criadoEm: Date;
 
+  @UpdateDateColumn()
+  atualizadoEm: Date;
+
+  @Column({
+    type: 'enum',
+    enum: ReportStatus,
+    default: ReportStatus.RECEBIDA,
+  })
+  status: ReportStatus;
+
   @ManyToOne(() => User, (user) => user.reports, { nullable: true })
   user: User;
 }
+export { ReportType };
